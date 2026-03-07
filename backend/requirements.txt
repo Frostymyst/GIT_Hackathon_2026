@@ -46,5 +46,7 @@ urllib3==2.6.3
 uvicorn==0.41.0
 watchfiles==1.1.1
 websockets==16.0
-caldav
-imaplib
+caldav==2.2.6
+dotenv==0.9.9
+IMAPClient==3.1.0
+icalendar==6.3.2
