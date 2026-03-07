@@ -2,11 +2,12 @@ from fastapi import FastAPI, HTTPException
 import mysql.connector
 import os
 
-from routers import employee, task
+from routers import admin, employee, task
 
 app = FastAPI()
 app.include_router(employee.router)
 app.include_router(task.router)
+app.include_router(admin.router)
 
 
 def connection():
