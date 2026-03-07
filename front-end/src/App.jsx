@@ -2,11 +2,12 @@ import { useState } from 'react';
 import Login from './components/Login.jsx';
 import Signup from './components/Signup.jsx';
 import Ticket from './components/Ticket.jsx';
+import Header from './components/Header.jsx';
 
 function App() {
   const [screen, setScreen] = useState('login');
   //const [auth, setAuth] = useState(true)
-  /*const User = {
+  const User = {
     id:1,
     name:"Matt",
     auth:3,
@@ -16,7 +17,7 @@ function App() {
       "Ethan",
       "Kelvin"
     ]
-  }*/
+  }
 
   if (screen === 'signup') {
     return <Signup onShowLogin={() => setScreen('login')} />;
@@ -24,6 +25,7 @@ function App() {
 
   return (
   <>
+  <Header user={User} />
   <Login onShowSignup={() => setScreen('signup')} />
     {/*
   <Ticket 
