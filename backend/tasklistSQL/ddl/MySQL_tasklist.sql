@@ -26,10 +26,11 @@ CREATE TABLE IF NOT EXISTS employees(
 CREATE TABLE IF NOT EXISTS task(
     tno INT PRIMARY KEY AUTO_INCREMENT,
     email VARCHAR(100),
+    name VARCHAR(100) NOT NULL,
     summary TEXT,
     description TEXT,
     status VARCHAR(20) NOT NULL,
-    due_date DATE NOT NULL,
+    due_date DATE,
     post_date DATE NOT NULL,
     ordering_access_date DATE NOT NULL,
     assigned_to INT,
