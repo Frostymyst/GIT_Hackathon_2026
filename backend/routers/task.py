@@ -94,7 +94,19 @@ async def get_task(task_id: int):
 @router.delete("/{task_id}")
 async def delete_task(task_id: int):
     """Delete task by ID"""
-    # TODO
+    sql, cursor = connection()
+    try:
+        cursor.execute("DELETE FROM task WHERE tno = %s", (task_id,))
+        sql.commit()
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Task not found")
+        return {"status": "OK", "deleted": True}
+    except mysql.connector.Error as err:
+        raise HTTPException(status_code=500, detail=str(err)) from err
+    finally:
+        if sql.is_connected():
+            cursor.close()
+            sql.close()
 
 
 @router.patch("/{task_id}/status")
