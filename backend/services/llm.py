@@ -6,8 +6,9 @@ from config import settings
 
 @dataclass
 class EmailResponseData:
+    name: str
     summary: str
-    tags: list[str]
+    category: str | None
     actions: dict[str, str] | None = None
 
     @classmethod
@@ -25,8 +26,9 @@ class EmailResponseData:
                     )
 
             return cls(
+                name=data.get("name", ""),
                 summary=data.get("summary", ""),
-                tags=data.get("tags", []),
+                category=data.get("category", None),
                 actions=actions,
             )
         except json.JSONDecodeError as e:
@@ -44,8 +46,9 @@ class ExistingEmailResponseData(EmailResponseData):
         try:
             data = json.loads(raw_str)
             return cls(
+                name=data.get("name", ""),
                 summary=data.get("summary", ""),
-                tags=data.get("tags", []),
+                category=data.get("category", None),
                 actions=data.get("actions", []),
                 context=context,
             )
@@ -65,27 +68,29 @@ class LLM:
     def handle_new_email(
         self,
         email_content: str,
-        valid_tags: list[str],
+        valid_categories: list[str],
         valid_actions: dict[str, str] | None = None,
     ) -> EmailResponseData:
-        """Extracts a summary and relevant tags from an email that is not associated with an existing ticket.
+        """Extracts a summary and relevant category from an email that is not associated with an existing ticket.
 
         Args:
             email_content (str): The full content of the incoming email.
-            valid_tags (list[str]): A list of valid tags that can be applied to the email.
+            valid_categories (list[str]): A list of valid categories that can be applied to the email.
             valid_actions (list[str] | None): An optional list of valid actions that can be recommended based on the email content.
 
         Returns:
-            EmailResponseData: Parsed summary and matched tags from the email.
+            EmailResponseData: Parsed summary and matched category from the email.
 
         Raises:
             ValueError: If the LLM response cannot be parsed as valid JSON.
         """
 
-        system_prompt = f"""You are a system that processes incoming emails. Your task is to read the email content, provide a concise summary of the email, and generate relevant tags based on the content. The summary should capture the main points of the email including any important details, numbers, dates, or mentions of specifics relevant to the email's context. The tags should be a list of keywords that represent the type of email and what the content of the email is about. 
+        system_prompt = f"""You are a system that processes incoming emails. Your task is to read the email content, provide a concise name and summary of the email, and assign a single relevant category based on the content. The summary should capture the main points of the email including any important details, numbers, dates, or mentions of specifics relevant to the email's context.
         
-        You MUST ONLY select tags from the following list of valid tags: {valid_tags}. If none of the valid tags apply, return an empty list for tags.
+        You MUST ONLY select a category from the following list of valid categories: {valid_categories}. Choose the single most appropriate category. If none of the valid categories apply, return null for category.
         
+        The name MUST be no more than 7 words and should concisely capture the subject of the email.
+
         The summary MUST be no greater than 300 words though should only be as long as necessary to capture all relevant information from the email. Any information that is essential such as order numbers, dates, or product names, shall be bolded by being wrapped in double asterisks (e.g. **order #12345**).
 
         DO NOT ask for anything that would prompt the customer to reply with an attachment as our system does not currently have the capability to process attachments.
@@ -94,8 +99,9 @@ class LLM:
         
         Your response should be in the following JSON format:
         {{
+            "name": str,
             "summary": str,
-            "tags": list[str],
+            "category": str | null,
             "actions": dict[str, str] | None
         }}
         """
@@ -117,7 +123,7 @@ class LLM:
     def generate_email_reply(
         self,
         description: str,
-        tags: list[str],
+        category: str | None,
         actions_to_take: dict[str, str] | None = None,
     ) -> str:
         """Generates a draft reply to an email based on the email content and its conversation history.
@@ -135,7 +141,7 @@ class LLM:
         
         Your response should ONLY include the draft reply and should not include any explanations, notes, 
         
-        This conversation has the following tags associated with it: {', '.join(tags)}
+        This conversation has the following category associated with it: {category}
         
         The email should be authored as being from the 'Customer Service Team' and should be signed off as such.
         
@@ -171,7 +177,7 @@ class LLM:
             ValueError: If the LLM response cannot be parsed as valid JSON.
         """
 
-        system_prompt = f"""You are a system that processes incoming email replies. Your task is to read the email content and its conversation history, provide a concise summary of the latest reply, and generate relevant tags based on the content.
+        system_prompt = f"""You are a system that processes incoming email replies. Your task is to read the email content and its conversation history, provide a concise summary of the latest reply, and assign a single relevant category based on the content.
 
         The summary MUST be no greater than 300 words. Any essential information such as order numbers, dates, or product names shall be bolded by being wrapped in double asterisks (e.g. **order #12345**).
         
@@ -180,7 +186,7 @@ class LLM:
         Your response should be in the following JSON format:
         {{
             "summary": str,
-            "tags": list[str],
+            "category": str | null,
             "actions": list[str]
         }}
         """
