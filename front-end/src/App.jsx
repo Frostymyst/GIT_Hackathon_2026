@@ -3,6 +3,7 @@ import Login from './components/Login.jsx';
 import Signup from './components/Signup.jsx';
 import Ticket from './components/Ticket.jsx';
 import Header from './components/Header.jsx';
+import MainList from './components/MainList.jsx';
 
 function App() {
   const [screen, setScreen] = useState('login');
@@ -25,9 +26,9 @@ function App() {
 
   return (
   <>
-  <Header user={User} />
-  <Login onShowSignup={() => setScreen('signup')} />
+  <MainList />
     {/*
+    <Login onShowSignup={() => setScreen('signup')} />
   <Ticket 
       id="123-456-789"
       title="Test Issue" 
