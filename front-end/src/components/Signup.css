@@ -1,6 +1,6 @@
-/* Center the login box on the page */
+/* Center the signup box on the page */
 
-.login-container {
+.signup-container {
 	min-height: 100vh;
 	display: flex;
 	align-items: center;
@@ -9,8 +9,8 @@
 	padding: 16px;
 }
 
-/* Login form box styling */
-.login-form {
+/* Signup form box styling */
+.signup-form {
 	border: 2px solid #222;
 	border-radius: 6px;
 	padding: 32px 24px 20px 24px;
@@ -25,56 +25,56 @@
 }
 /* Responsive adjustments for tablets and mobile */
 @media (max-width: 600px) {
-	.login-form {
+	.signup-form {
 		padding: 20px 8px 16px 8px;
 		max-width: 98vw;
 		min-width: unset;
 	}
-	.login-title {
+	.signup-title {
 		font-size: 1.5rem;
 	}
-	.login-subtitle {
+	.signup-subtitle {
 		font-size: 0.95rem;
 	}
-	.login-label, .remember-me, .forgot-password, .signup-link {
+	.signup-label, .signup-terms, .signup-link {
 		font-size: 0.98rem;
 	}
-	.login-button {
+	.signup-button {
 		font-size: 1rem;
 		padding: 9px 0;
 	}
 }
 
 @media (max-width: 400px) {
-	.login-form {
+	.signup-form {
 		padding: 10px 2vw 10px 2vw;
 		max-width: 100vw;
 	}
-	.login-title {
+	.signup-title {
 		font-size: 1.2rem;
 	}
 }
 
-.login-title {
+.signup-title {
 	margin: 0 0 4px 0;
 	font-size: 2rem;
 	font-weight: 600;
 }
 
-.login-subtitle {
+.signup-subtitle {
 	margin: 0 0 18px 0;
 	font-size: 1rem;
 	color: #444;
 }
 
-.login-label {
+.signup-label {
 	margin-top: 10px;
 	margin-bottom: 2px;
 	font-size: 1rem;
 	font-weight: 500;
 }
 
-.login-input {
+.signup-input {
 	width: 100%;
 	padding: 8px 10px;
 	font-size: 1rem;
@@ -85,35 +85,22 @@
 	box-sizing: border-box;
 }
 
-.login-options-row {
+.signup-terms-row {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
-	margin: 8px 0 10px 0;
+	margin: 10px 0 0 0;
 }
-
-.remember-me {
+.signup-terms {
 	display: flex;
 	align-items: center;
 	font-size: 1rem;
 	gap: 4px;
 }
-
-.login-checkbox {
+.signup-checkbox {
 	margin-right: 4px;
 }
 
-.forgot-password {
-	font-size: 1rem;
-	color: #222;
-	text-decoration: none;
-	margin-left: 10px;
-}
-.forgot-password:hover {
-	text-decoration: underline;
-}
-
-.login-button {
+.signup-button {
 	width: 100%;
 	padding: 10px 0;
 	font-size: 1.1rem;
@@ -122,24 +109,10 @@
 	border: 2px solid #222;
 	border-radius: 6px;
 	box-shadow: 2px 2px 0 #888;
-	margin: 10px 0 0 0;
+	margin: 18px 0 0 0;
 	cursor: pointer;
 	transition: background 0.2s;
 }
-.login-button:hover {
+.signup-button:hover {
 	background: #f0f0f0;
-}
-
-.signup-link {
-	text-align: center;
-	margin-top: 18px;
-	font-size: 1rem;
-}
-.signup-link a {
-	color: #2671e6;
-	text-decoration: none;
-	font-weight: 500;
-}
-.signup-link a:hover {
-	text-decoration: underline;
 }
