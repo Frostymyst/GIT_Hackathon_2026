@@ -1,0 +1,35 @@
+/* CompanyPage.css */
+.company-page-container {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  padding: 0;
+}
+
+.company-form-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+@media (max-width: 600px) {
+  .company-page-container {
+    padding: 0 2vw;
+  }
+  .company-form-wrapper {
+    min-height: 40vh;
+  }
+}
+
+@media (max-width: 400px) {
+  .company-page-container {
+    padding: 0 1vw;
+  }
+  .company-form-wrapper {
+    min-height: 20vh;
+  }
+}
