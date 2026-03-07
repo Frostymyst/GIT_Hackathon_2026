@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
+import mysql.connector
 from pydantic import BaseModel
-
-from ..services.adminSetCategories import create_category, delete_category
+from ..main import connection
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -13,23 +13,41 @@ class CategoryRequest(BaseModel):
 @router.post("/categories")
 async def add_category(payload: CategoryRequest):
     """Create a task category."""
+    sql, cursor = connection()
     try:
-        created = create_category(cname=payload.cname)
-        return {"status": "OK", "created": created}
-    except RuntimeError as exc:
-        # MySQL duplicate-key violations surface here from service exceptions.
-        if "Duplicate entry" in str(exc):
-            raise HTTPException(status_code=409, detail="Category already exists") from exc
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
+        cursor.execute(
+            "INSERT INTO task_categories (cname) VALUES (%s)",
+            (payload.cname,),
+        )
+        sql.commit()
+        return {"status": "OK", "created": True}
+    except mysql.connector.Error as err:
+        if "Duplicate entry" in str(err):
+            raise HTTPException(status_code=409, detail="Category already exists") from err
+        raise HTTPException(status_code=500, detail=str(err)) from err
+    finally:
+        if sql.is_connected():
+            cursor.close()
+            sql.close()
 
 
 @router.delete("/categories/{cname}")
 async def remove_category(cname: str):
     """Delete a task category by name."""
+    sql, cursor = connection()
     try:
-        deleted = delete_category(cname=cname)
+        cursor.execute(
+            "DELETE FROM task_categories WHERE cname = %s",
+            (cname,),
+        )
+        sql.commit()
+        deleted = cursor.rowcount > 0
         if not deleted:
             raise HTTPException(status_code=404, detail="Category not found")
         return {"status": "OK", "deleted": True}
-    except RuntimeError as exc:
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    except mysql.connector.Error as err:
+        raise HTTPException(status_code=500, detail=str(err)) from err
+    finally:
+        if sql.is_connected():
+            cursor.close()
+            sql.close()
