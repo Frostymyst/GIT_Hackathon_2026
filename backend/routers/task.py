@@ -12,13 +12,15 @@ ai = LLM()
 
 
 def connection():
-    return mysql.connector.connect(
+    sql = mysql.connector.connect(
         host=os.getenv("MYSQL_HOST", "127.0.0.1"),
         port=int(os.getenv("MYSQL_PORT", "3309")),
         user=os.getenv("MYSQL_USER", "tasklist"),
         password=os.getenv("MYSQL_PASSWORD", "password"),
         database=os.getenv("MYSQL_DB", "tasklist"),
     )
+    cursor = sql.cursor(dictionary=True)
+    return sql, cursor
 
 
 class CreateTaskRequest(BaseModel):
@@ -30,8 +32,7 @@ class CreateTaskRequest(BaseModel):
 @router.get("/")
 async def get_tasks(category: str | None = None):
     """Get all tasks, or get tasks by category"""
-    sql = connection()
-    cursor = sql.cursor(dictionary=True)
+    sql, cursor = connection()
     try:
         if category:
             if category == "null":
@@ -86,7 +87,20 @@ async def make_new_task(task_data: CreateTaskRequest):
 @router.get("/{task_id}")
 async def get_task(task_id: int):
     """Get task by ID"""
-    # TODO
+    sql, cursor = connection()
+    try:
+        cursor.execute("SELECT * FROM task WHERE tno = %s", (task_id,))
+        task = cursor.fetchone()
+        if task:
+            return {"status": "OK", "task": task}
+        else:
+            raise HTTPException(status_code=404, detail="Task not found")
+    except mysql.connector.Error as err:
+        raise HTTPException(status_code=500, detail=str(err)) from err
+    finally:
+        if sql.is_connected():
+            cursor.close()
+            sql.close()
 
 
 @router.delete("/{task_id}")
