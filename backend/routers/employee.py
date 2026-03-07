@@ -1,4 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+from database import connection
+import mysql.connector
 
 router = APIRouter(prefix="/employee", tags=["employee"])
 
@@ -7,6 +9,27 @@ router = APIRouter(prefix="/employee", tags=["employee"])
 async def get_employees():
     """Get all employees"""
     # TODO
+    return {"status": "OK", "employees": []}
+
+
+@router.get("/search")
+async def search_employees(query: str):
+    """Search employees by name or email"""
+    sql, cursor = connection()
+    try:
+        like_query = f"%{query}%"
+        cursor.execute(
+            "SELECT * FROM employee WHERE name LIKE %s OR email LIKE %s",
+            (like_query, like_query),
+        )
+        employees = cursor.fetchall()
+        return {"status": "OK", "employees": employees}
+    except mysql.connector.Error as err:
+        raise HTTPException(status_code=500, detail=str(err)) from err
+    finally:
+        if sql.is_connected():
+            cursor.close()
+            sql.close()
 
 
 @router.post("/")

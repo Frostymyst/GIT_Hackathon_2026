@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 import mysql.connector
 from pydantic import BaseModel
-from ..main import connection
+from database import connection
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -23,7 +23,9 @@ async def add_category(payload: CategoryRequest):
         return {"status": "OK", "created": True}
     except mysql.connector.Error as err:
         if "Duplicate entry" in str(err):
-            raise HTTPException(status_code=409, detail="Category already exists") from err
+            raise HTTPException(
+                status_code=409, detail="Category already exists"
+            ) from err
         raise HTTPException(status_code=500, detail=str(err)) from err
     finally:
         if sql.is_connected():

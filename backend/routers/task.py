@@ -5,7 +5,7 @@ from services.llm import LLM
 from services.createTask import create_task
 from datetime import date
 import mysql.connector
-from ..main import connection
+from database import connection
 
 router = APIRouter(prefix="/task", tags=["task"])
 ai = LLM()
