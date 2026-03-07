@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from services.llm import LLM
-from starvationOrganizer import fetch_starving_task_ids
+from backend.services.starvationOrganizer import fetch_starving_task_ids
 
 app = FastAPI()
 
@@ -50,7 +50,7 @@ def ai_test():
 
 @app.get("/tasks/starving", response_model=list[int])
 def get_starving_tasks():
-    """Return only starving task IDs (oldest last_accessed_date first)."""
+    """Return front-of-list starving task IDs by ordering_access_date."""
     try:
         return fetch_starving_task_ids()
     except RuntimeError as exc:

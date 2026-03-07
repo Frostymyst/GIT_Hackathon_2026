@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS task(
     status VARCHAR(20) NOT NULL,
     due_date DATE NOT NULL,
     post_date DATE NOT NULL,
-    last_accessed_date DATE NOT NULL,
+    ordering_access_date DATE NOT NULL,
     assigned_to INT,
     categories VARCHAR(50),
 
