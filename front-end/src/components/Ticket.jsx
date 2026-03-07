@@ -50,7 +50,7 @@ function Ticket(props) {
                 {btns ? 
                 <form onSubmit={handleAssign} className='AssignForm' id={props.id}>
                     <button type='submit' className='AssignBtn'>Assign To</button>
-                    <select className='AssignSelect' name={props.id} multiple={true}>
+                    <select className='AssignSelect' name={props.id} multiple={true} size={3}>
                         <option key={props.user.id} value={props.user.name}>{props.user.name}</option>
                         {btns}
                     </select>
