@@ -1,4 +1,40 @@
 .TaskView {
     border: 2px black solid;
-    padding: 15px;
+    padding: 5px;
+    text-align: left;
+    width: 95%;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.TaskView ul {
+    list-style-type: none;
+    padding-left: 0%;
+}
+
+.TaskView ul li {
+    border: 2px black solid;
+    background-color: darkslategrey;
+    border-radius: 5px;
+    display: inline;
+    margin: 0.2rem;
+    padding: 0.2rem;
+}
+
+.AssignBtn {
+    padding: 10px;
+    margin: auto 15px;
+}
+
+.TaskBtns {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+form {
+    display: flex;
+    justify-content: center;
 }
