@@ -106,7 +106,17 @@ async def update_task(task_id: int):
 @router.get("/categories")
 async def get_task_categories():
     """Get all task categories"""
-    # TODO
+    sql, cursor = connection()
+    try:
+        cursor.execute("SELECT * FROM task_categories")
+        categories = cursor.fetchall()
+        return {"status": "OK", "categories": categories}
+    except mysql.connector.Error as err:
+        raise HTTPException(status_code=500, detail=str(err)) from err
+    finally:
+        if sql.is_connected():
+            cursor.close()
+            sql.close()
 
 
 @router.get("/starving")
