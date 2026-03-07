@@ -27,7 +27,7 @@ def root():
     return {"status": "OK"}
 
 
-@app.get("/login")
+@app.put("/login")
 def login(email: str, password: str):
     sql, cursor = connection()
     try:
