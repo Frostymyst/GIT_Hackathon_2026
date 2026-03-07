@@ -1,0 +1,111 @@
+/* Center the login box on the page */
+.login-container {
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #fff;
+}
+
+/* Login form box styling */
+.login-form {
+	border: 2px solid #222;
+	border-radius: 6px;
+	padding: 36px 40px 24px 40px;
+	background: #fff;
+	box-shadow: 1px 2px 0 #888;
+	min-width: 350px;
+	max-width: 400px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.login-title {
+	margin: 0 0 4px 0;
+	font-size: 2rem;
+	font-weight: 600;
+}
+
+.login-subtitle {
+	margin: 0 0 18px 0;
+	font-size: 1rem;
+	color: #444;
+}
+
+.login-label {
+	margin-top: 10px;
+	margin-bottom: 2px;
+	font-size: 1rem;
+	font-weight: 500;
+}
+
+.login-input {
+	width: 100%;
+	padding: 8px 10px;
+	font-size: 1rem;
+	border: 2px solid #aaa;
+	border-radius: 3px;
+	background: #eaeaea;
+	margin-bottom: 6px;
+	box-sizing: border-box;
+}
+
+.login-options-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin: 8px 0 10px 0;
+}
+
+.remember-me {
+	display: flex;
+	align-items: center;
+	font-size: 1rem;
+	gap: 4px;
+}
+
+.login-checkbox {
+	margin-right: 4px;
+}
+
+.forgot-password {
+	font-size: 1rem;
+	color: #222;
+	text-decoration: none;
+	margin-left: 10px;
+}
+.forgot-password:hover {
+	text-decoration: underline;
+}
+
+.login-button {
+	width: 100%;
+	padding: 10px 0;
+	font-size: 1.1rem;
+	font-weight: 500;
+	background: #fff;
+	border: 2px solid #222;
+	border-radius: 6px;
+	box-shadow: 2px 2px 0 #888;
+	margin: 10px 0 0 0;
+	cursor: pointer;
+	transition: background 0.2s;
+}
+.login-button:hover {
+	background: #f0f0f0;
+}
+
+.signup-link {
+	text-align: center;
+	margin-top: 18px;
+	font-size: 1rem;
+}
+.signup-link a {
+	color: #2671e6;
+	text-decoration: none;
+	font-weight: 500;
+}
+.signup-link a:hover {
+	text-decoration: underline;
+}
