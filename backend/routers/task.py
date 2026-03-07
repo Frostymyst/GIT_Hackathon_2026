@@ -4,6 +4,8 @@ from pydantic import BaseModel
 from services.llm import LLM
 from services.createTask import create_task
 from datetime import date
+import mysql.connector
+from ..main import connection
 
 router = APIRouter(prefix="/task", tags=["task"])
 ai = LLM()
@@ -16,9 +18,25 @@ class CreateTaskRequest(BaseModel):
 
 
 @router.get("/")
-async def get_tasks():
-    """Get all tasks"""
-    # TODO
+async def get_tasks(category: str | None = None):
+    """Get all tasks, or get tasks by category"""
+    sql, cursor = connection()
+    try:
+        if category:
+            if category == "null":
+                cursor.execute("SELECT * FROM task WHERE categories IS NULL")
+            else:
+                cursor.execute("SELECT * FROM task WHERE categories = %s", (category,))
+        else:
+            cursor.execute("SELECT * FROM task")
+        tasks = cursor.fetchall()
+        return {"status": "OK", "tasks": tasks}
+    except mysql.connector.Error as err:
+        raise HTTPException(status_code=500, detail=str(err)) from err
+    finally:
+        if sql.is_connected():
+            cursor.close()
+            sql.close()
 
 
 @router.post("/")
@@ -57,7 +75,20 @@ async def make_new_task(task_data: CreateTaskRequest):
 @router.get("/{task_id}")
 async def get_task(task_id: int):
     """Get task by ID"""
-    # TODO
+    sql, cursor = connection()
+    try:
+        cursor.execute("SELECT * FROM task WHERE tno = %s", (task_id,))
+        task = cursor.fetchone()
+        if task:
+            return {"status": "OK", "task": task}
+        else:
+            raise HTTPException(status_code=404, detail="Task not found")
+    except mysql.connector.Error as err:
+        raise HTTPException(status_code=500, detail=str(err)) from err
+    finally:
+        if sql.is_connected():
+            cursor.close()
+            sql.close()
 
 
 @router.delete("/{task_id}")
@@ -75,7 +106,17 @@ async def update_task(task_id: int):
 @router.get("/categories")
 async def get_task_categories():
     """Get all task categories"""
-    # TODO
+    sql, cursor = connection()
+    try:
+        cursor.execute("SELECT * FROM task_categories")
+        categories = cursor.fetchall()
+        return {"status": "OK", "categories": categories}
+    except mysql.connector.Error as err:
+        raise HTTPException(status_code=500, detail=str(err)) from err
+    finally:
+        if sql.is_connected():
+            cursor.close()
+            sql.close()
 
 
 @router.get("/starving")
