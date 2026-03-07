@@ -1,12 +1,31 @@
-// eslint-disable-next-line no-unused-vars
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import React from 'react';
 import './Ticket.css';
 
 function Ticket(props) {
+    let [msg, setMsg] = useState("")
+
+    const handleAssign = (event) => {
+        event.preventDefault();
+        const selected = new FormData(event.target);
+        setMsg(event.target.id + " assigned to " + [...selected.values()]);
+    }
+
+    const handleSelfAssign = (event) => {
+        setMsg(event.target.id + " assigned to " + props.user.name);
+    }
+
+    useEffect(() => {
+        console.log(msg);
+    }, [msg]);
+
     let items;
     if (props.keywords != false) {
-        items = props.keywords.map(e => <li>{e}</li>)
+        items = props.keywords.map(e => <li key={e}>{e}</li>)
+    }
+    let btns;
+    if (props.user.auth > 1) {
+        btns = props.user.employees.map(e => <option key={e} value={e}>{e}</option>)
     }
 
     return (
@@ -26,6 +45,21 @@ function Ticket(props) {
                 <ul className='TaskTags'>
                     {items ? items:"Error"}
                 </ul>
+            </div>
+            <div>
+                
+                    {btns ? 
+                    <form onSubmit={handleAssign} className='AssignForm' id={props.id}>
+                        <select className='AssignSelect' name={props.id} multiple={true}>
+                            <option key={props.user.id} value={props.user.name}>{props.user.name}</option>
+                            {btns}
+                        </select>
+                        <button type='submit'>Assign To</button>
+                    </form>
+                    :
+                    <button onClick={handleSelfAssign} className='AssignBtn' id={props.id}>
+                        Assign Self
+                    </button>}
             </div>
         </div>
     )
