@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS employees(
 
 CREATE TABLE IF NOT EXISTS task(
     tno INT PRIMARY KEY AUTO_INCREMENT,
-    email VARCHAR(100) NOT NULL,
+    email VARCHAR(100),
     summary TEXT,
     description TEXT,
     status VARCHAR(20) NOT NULL,
@@ -65,3 +65,4 @@ INSERT INTO workson (eno, tno) VALUES
 (1, 1), 
 (2, 2), 
 (3, 3);
+
