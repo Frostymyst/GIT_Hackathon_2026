@@ -29,7 +29,7 @@ class Email:
         self.body = body
 
     def __str__(self):
-        return f"UID: {self.uid} | From: {self.sender} | Subject: {self.subject} | Date: {self.date} | Body: {self.body}"
+        return f"From: {self.sender} | Subject: {self.subject} | Date: {self.date}\nBody: {self.body}"
 
 
 # IMAP - Fetch latest emails
@@ -119,10 +119,10 @@ def create_event(title:str, start:datetime, end:datetime):
 
 
 
-email_list = fetch_emails()
-for emailMsg in email_list:
-    print(emailMsg)
-
-#send_email()
-fetch_calendar()
-#create_event("Event", datetime(2026, 3, 10, 10, 0), datetime(2026, 3, 10, 11, 0))
+if __name__ == "__main__":
+    email_list = fetch_emails()
+    for emailMsg in email_list:
+        print(emailMsg)
+    #send_email()
+    #fetch_calendar()
+    #create_event("Event", datetime(2026, 3, 10, 10, 0), datetime(2026, 3, 10, 11, 0))
