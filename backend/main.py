@@ -1,6 +1,5 @@
 from fastapi import FastAPI, HTTPException
 from services.llm import LLM
-from backend.services.starvationOrganizer import fetch_starving_task_ids
 
 from routers import employee, task
 
@@ -50,12 +49,3 @@ def ai_test():
         "actions": initial_result.actions,
         "draft_reply": ai_response,
     }
-
-
-@app.get("/tasks/starving", response_model=list[int])
-def get_starving_tasks():
-    """Return front-of-list starving task IDs by ordering_access_date."""
-    try:
-        return fetch_starving_task_ids()
-    except RuntimeError as exc:
-        raise HTTPException(status_code=500, detail=str(exc)) from exc

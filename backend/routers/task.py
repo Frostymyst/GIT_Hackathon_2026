@@ -1,4 +1,5 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+from ..services.starvationOrganizer import fetch_starving_task_ids
 
 router = APIRouter(prefix="/task", tags=["task"])
 
@@ -37,3 +38,12 @@ async def update_task(task_id: int):
 async def get_task_categories():
     """Get all task categories"""
     # TODO
+
+
+@router.get("/starving")
+def get_starving_tasks():
+    """Return front-of-list starving task IDs by ordering_access_date."""
+    try:
+        return fetch_starving_task_ids()
+    except RuntimeError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
