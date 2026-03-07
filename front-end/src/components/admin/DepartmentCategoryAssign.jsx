@@ -43,7 +43,7 @@ function DepartmentCategoryAssign() {
       await assignCategoryToDepartment(departmentId, categoryName);
       setStatus('Category assigned to department.');
     } catch (error) {
-      setStatus(error.message || 'Unable to assign category.');
+      setStatus(error.message || 'Category assignment endpoint is not available yet.');
     }
   }
 
@@ -57,7 +57,7 @@ function DepartmentCategoryAssign() {
       await removeCategoryFromDepartment(departmentId, categoryName);
       setStatus('Category removed from department.');
     } catch (error) {
-      setStatus(error.message || 'Unable to remove category assignment.');
+      setStatus(error.message || 'Category removal endpoint is not available yet.');
     }
   }
 

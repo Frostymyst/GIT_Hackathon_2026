@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { createDepartment, getDepartments, updateDepartment } from '../../api/adminApi';
+import { createDepartment, deleteDepartment, getDepartments } from '../../api/adminApi';
 import AdminSectionCard from './AdminSectionCard';
 
 function DepartmentManager() {
   const [departments, setDepartments] = useState([]);
   const [name, setName] = useState('');
-  const [editId, setEditId] = useState('');
+  const [selectedDepartmentName, setSelectedDepartmentName] = useState('');
   const [status, setStatus] = useState('');
 
   async function loadDepartments() {
@@ -32,7 +32,7 @@ function DepartmentManager() {
     }
 
     try {
-      await createDepartment({ name: name.trim() });
+      await createDepartment({ dname: name.trim() });
       setStatus('Department added.');
       setName('');
       loadDepartments();
@@ -41,20 +41,19 @@ function DepartmentManager() {
     }
   }
 
-  async function handleUpdateDepartment() {
-    if (!editId || !name.trim()) {
-      setStatus('Select a department and enter a new name.');
+  async function handleDeleteDepartment() {
+    if (!selectedDepartmentName) {
+      setStatus('Select a department to delete.');
       return;
     }
 
     try {
-      await updateDepartment(editId, { name: name.trim() });
-      setStatus('Department updated.');
-      setName('');
-      setEditId('');
+      await deleteDepartment(selectedDepartmentName);
+      setStatus('Department deleted.');
+      setSelectedDepartmentName('');
       loadDepartments();
     } catch (error) {
-      setStatus(error.message || 'Unable to update department.');
+      setStatus(error.message || 'Unable to delete department.');
     }
   }
 
@@ -72,16 +71,23 @@ function DepartmentManager() {
       </form>
 
       <div className="admin-form-row">
-        <select className="admin-input" value={editId} onChange={(event) => setEditId(event.target.value)}>
-          <option value="">Select department to update</option>
+        <select
+          className="admin-input"
+          value={selectedDepartmentName}
+          onChange={(event) => setSelectedDepartmentName(event.target.value)}
+        >
+          <option value="">Select department to delete</option>
           {departments.map((dept) => (
-            <option key={dept.id || dept.dno || dept.name} value={dept.id || dept.dno}>
+            <option
+              key={dept.id || dept.dno || dept.name}
+              value={dept.name || dept.dname || ''}
+            >
               {dept.name || dept.dname || `Department ${dept.id || dept.dno}`}
             </option>
           ))}
         </select>
-        <button type="button" className="admin-btn admin-btn-alt" onClick={handleUpdateDepartment}>
-          Update Name
+        <button type="button" className="admin-btn admin-btn-alt" onClick={handleDeleteDepartment}>
+          Delete
         </button>
       </div>
 
