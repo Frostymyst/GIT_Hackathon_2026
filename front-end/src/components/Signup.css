@@ -116,3 +116,19 @@
 .signup-button:hover {
 	background: #f0f0f0;
 }
+
+.signup-link {
+	text-align: center;
+	margin-top: 14px;
+	font-size: 1rem;
+}
+
+.signup-link a {
+	color: #2671e6;
+	text-decoration: none;
+	font-weight: 500;
+}
+
+.signup-link a:hover {
+	text-decoration: underline;
+}

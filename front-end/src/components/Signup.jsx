@@ -1,7 +1,14 @@
 
 import './Signup.css';
 
-function Signup() {
+function Signup({ onShowLogin }) {
+    const handleShowLogin = (event) => {
+        event.preventDefault();
+        if (onShowLogin) {
+            onShowLogin();
+        }
+    };
+
     return (
         <div className="signup-container">
             <form className="signup-form">
@@ -70,6 +77,10 @@ function Signup() {
                 </div>
 
                 <button type="submit" className="signup-button">Signup</button>
+
+                <p className="signup-link">
+                    Already have an account? <a href="#" onClick={handleShowLogin}>Sign in</a>
+                </p>
             </form>
         </div>
     );
