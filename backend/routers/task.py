@@ -5,22 +5,10 @@ from services.llm import LLM
 from services.createTask import create_task
 from datetime import date
 import mysql.connector
-import os
+from ..main import connection
 
 router = APIRouter(prefix="/task", tags=["task"])
 ai = LLM()
-
-
-def connection():
-    sql = mysql.connector.connect(
-        host=os.getenv("MYSQL_HOST", "127.0.0.1"),
-        port=int(os.getenv("MYSQL_PORT", "3309")),
-        user=os.getenv("MYSQL_USER", "tasklist"),
-        password=os.getenv("MYSQL_PASSWORD", "password"),
-        database=os.getenv("MYSQL_DB", "tasklist"),
-    )
-    cursor = sql.cursor(dictionary=True)
-    return sql, cursor
 
 
 class CreateTaskRequest(BaseModel):
