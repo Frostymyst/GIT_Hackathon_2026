@@ -2,7 +2,11 @@ from fastapi import FastAPI, HTTPException
 from services.llm import LLM
 from backend.services.starvationOrganizer import fetch_starving_task_ids
 
+from routers import employee, task
+
 app = FastAPI()
+app.include_router(employee.router)
+app.include_router(task.router)
 
 
 @app.get("/")
@@ -34,7 +38,7 @@ def ai_test():
     print(initial_result)
 
     ai_response = ai.generate_email_reply(
-        email_content, [], initial_result.tags, initial_result.actions
+        email_content, initial_result.tags, initial_result.actions
     )
 
     print(ai_response)
