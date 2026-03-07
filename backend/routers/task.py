@@ -1,7 +1,18 @@
 from fastapi import APIRouter, HTTPException
 from services.starvationOrganizer import fetch_starving_task_ids
+from pydantic import BaseModel
+from services.llm import LLM
+from services.createTask import create_task
+from datetime import date
 
 router = APIRouter(prefix="/task", tags=["task"])
+ai = LLM()
+
+
+class CreateTaskRequest(BaseModel):
+    email: str | None = None
+    description: str
+    due_date: int | None = None
 
 
 @router.get("/")
@@ -11,9 +22,36 @@ async def get_tasks():
 
 
 @router.post("/")
-async def create_task():
+async def make_new_task(task_data: CreateTaskRequest):
     """Create a new task"""
-    # TODO
+    email = task_data.email
+    description = task_data.description
+    due_date = task_data.due_date
+
+    ai_response = ai.handle_new_email(
+        description, valid_categories=[], valid_actions={}
+    )
+
+    name = ai_response.name
+    summary = ai_response.summary
+    category = ai_response.category
+
+    print(name)
+    print(summary)
+    print(category)
+
+    task_id = create_task(
+        name,
+        email,
+        summary,
+        description,
+        date.fromtimestamp(due_date) if due_date else None,
+        "new",
+        None,
+        category,
+    )
+
+    return {"status": "success", "task_id": task_id}
 
 
 @router.get("/{task_id}")
