@@ -97,10 +97,54 @@ async def delete_task(task_id: int):
     # TODO
 
 
-@router.patch("/{task_id}")
-async def update_task(task_id: int):
-    """Update task by ID"""
-    # TODO
+@router.patch("/{task_id}/status")
+async def update_task(task_id: int, new_status: str | None = None):
+    """Set a task's status to the next stage in the workflow"""
+    STATUSES = ["new", "in-progress", "delayed", "completed"]
+
+    sql, cursor = connection()
+    try:
+        cursor.execute("SELECT status FROM task WHERE tno = %s", (task_id,))
+        task = cursor.fetchone()
+        if not task:
+            raise HTTPException(status_code=404, detail="Task not found")
+        current_status = str(task["status"])
+        if new_status:
+            if new_status not in STATUSES:
+                raise HTTPException(status_code=400, detail="Invalid new status")
+            next_status = new_status
+        else:
+            try:
+                next_status = (
+                    "in-progress"
+                    if current_status == "new"
+                    else (
+                        "completed"
+                        if current_status == "in-progress"
+                        else (
+                            "in-progress"
+                            if current_status == "delayed"
+                            else current_status
+                        )
+                    )
+                )
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid current status")
+
+        cursor.execute(
+            "UPDATE task SET status = %s WHERE tno = %s",
+            (next_status, task_id),
+        )
+        sql.commit()
+
+        return {"status": "OK", "new_status": next_status}
+
+    except mysql.connector.Error as err:
+        raise HTTPException(status_code=500, detail=str(err)) from err
+    finally:
+        if sql.is_connected():
+            cursor.close()
+            sql.close()
 
 
 @router.get("/categories")
