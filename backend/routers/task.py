@@ -4,9 +4,21 @@ from pydantic import BaseModel
 from services.llm import LLM
 from services.createTask import create_task
 from datetime import date
+import mysql.connector
+import os
 
 router = APIRouter(prefix="/task", tags=["task"])
 ai = LLM()
+
+
+def connection():
+    return mysql.connector.connect(
+        host=os.getenv("MYSQL_HOST", "127.0.0.1"),
+        port=int(os.getenv("MYSQL_PORT", "3309")),
+        user=os.getenv("MYSQL_USER", "tasklist"),
+        password=os.getenv("MYSQL_PASSWORD", "password"),
+        database=os.getenv("MYSQL_DB", "tasklist"),
+    )
 
 
 class CreateTaskRequest(BaseModel):
@@ -16,9 +28,26 @@ class CreateTaskRequest(BaseModel):
 
 
 @router.get("/")
-async def get_tasks():
-    """Get all tasks"""
-    # TODO
+async def get_tasks(category: str | None = None):
+    """Get all tasks, or get tasks by category"""
+    sql = connection()
+    cursor = sql.cursor(dictionary=True)
+    try:
+        if category:
+            if category == "null":
+                cursor.execute("SELECT * FROM task WHERE categories IS NULL")
+            else:
+                cursor.execute("SELECT * FROM task WHERE categories = %s", (category,))
+        else:
+            cursor.execute("SELECT * FROM task")
+        tasks = cursor.fetchall()
+        return {"status": "OK", "tasks": tasks}
+    except mysql.connector.Error as err:
+        raise HTTPException(status_code=500, detail=str(err)) from err
+    finally:
+        if sql.is_connected():
+            cursor.close()
+            sql.close()
 
 
 @router.post("/")
