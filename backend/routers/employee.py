@@ -19,8 +19,12 @@ async def search_employees(query: str):
     try:
         like_query = f"%{query}%"
         cursor.execute(
-            "SELECT * FROM employee WHERE name LIKE %s OR email LIKE %s",
-            (like_query, like_query),
+            "SELECT employees.*, dept.dname"
+            " FROM employees"
+            " LEFT JOIN dept ON employees.dno = dept.dno"
+            " WHERE employees.ename LIKE %s OR employees.email LIKE %s"
+            " OR employees.eno LIKE %s OR dept.dname LIKE %s",
+            (like_query, like_query, like_query, like_query),
         )
         employees = cursor.fetchall()
         return {"status": "OK", "employees": employees}
