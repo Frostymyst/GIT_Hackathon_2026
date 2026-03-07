@@ -35,11 +35,11 @@ class EmailResponseData:
 
 @dataclass
 class ExistingEmailResponseData(EmailResponseData):
-    context: list[str] | None = None
+    context: str | None = None
 
     @classmethod
     def parse_raw(
-        cls, raw_str: str, all_actions: dict[str, str], context: list[str] | None = None
+        cls, raw_str: str, all_actions: dict[str, str], context: str | None = None
     ) -> ExistingEmailResponseData:
         try:
             data = json.loads(raw_str)
@@ -116,8 +116,7 @@ class LLM:
 
     def generate_email_reply(
         self,
-        email_content: str,
-        conversation_history: list[str],
+        description: str,
         tags: list[str],
         actions_to_take: dict[str, str] | None = None,
     ) -> str:
@@ -148,9 +147,7 @@ class LLM:
         
         DO NOT indicate that you are an AI language model in the response and DO NOT refer to yourself as an AI language model. You are a helpful customer service assistant that is drafting a reply on behalf of the Customer Service Team. If you do not know how to respond to the email, you should respond saying that you will escalate the issue to another representative who will be better able to assist them and that they will be in touch with them shortly. DO NOT say that the issue is being escalated to a human representative as that implies that you are not human."""
 
-        history_text = "\n---\n".join(conversation_history)
-
-        prompt = f"{system_prompt}\n\nConversation History:\n{history_text}\n\nLatest Email:\n{email_content}\n\nActions to Take:\n{actions_to_take if actions_to_take else 'None'}\n\nDraft a reply to the latest email based on the conversation history and actions to take."
+        prompt = f"{system_prompt}\n\nConversation History:\n{description}\n\nActions to Take:\n{actions_to_take if actions_to_take else 'None'}\n\nDraft a reply to the latest email based on the conversation history and actions to take."
 
         response = self.prompt(prompt)
 
@@ -158,8 +155,7 @@ class LLM:
 
     def handle_email_reply(
         self,
-        email_content: str,
-        conversation_history: list[dict],
+        description: str,
         valid_actions: dict[str, str] | None = None,
     ) -> ExistingEmailResponseData:
         """Extracts a summary and relevant tags from an email reply within an existing conversation.
@@ -189,22 +185,13 @@ class LLM:
         }}
         """
 
-        history_text = "\n---\n".join(
-            [
-                f"{msg.get('role', 'unknown').upper()}:\n{msg.get('content', '')}"
-                for msg in conversation_history
-            ]
-        )
-
-        prompt = f"{system_prompt}\n\nConversation History:\n{history_text}\n\nLatest Email Reply:\n{email_content}"
+        prompt = f"{system_prompt}\n\nConversation History:\n{description}"
 
         response = self.prompt(prompt)
 
-        context = [msg.get("content", "") for msg in conversation_history]
-
         try:
             response_data = ExistingEmailResponseData.parse_raw(
-                response, valid_actions if valid_actions else {}, context=context
+                response, valid_actions if valid_actions else {}, context=description
             )
         except Exception as e:
             raise ValueError(f"Failed to parse LLM response: {e}")
