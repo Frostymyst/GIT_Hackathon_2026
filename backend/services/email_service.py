@@ -21,7 +21,7 @@ CALDAV_URL = os.getenv("CALDAV_URL", "")
 
 
 # IMAP - Fetch latest emails
-def fetch_emails(n: int):
+def fetch_emails(n: int, offset: int = 0):
     email_list = []
     print("\n=== Fetching Emails (IMAP) ===")
     with imaplib.IMAP4_SSL(IMAP_SERVER) as mail:
@@ -29,7 +29,9 @@ def fetch_emails(n: int):
         mail.select("INBOX") # Select Mailbox
         _, data = mail.search(None, "ALL")
         ids = data[0].split()
-        latest = ids[-n:]
+        end = len(ids) - offset
+        start = max(0, end - n)
+        latest = ids[start:end]
         for uid in reversed(latest):
             _, msg_data = mail.fetch(uid, "(RFC822)")
             msg = email.message_from_bytes(msg_data[0][1])
@@ -46,7 +48,6 @@ def fetch_emails(n: int):
                 if isinstance(payload, bytes):
                     body = payload.decode(errors="replace")
             email_list.append(emailMsg(uid=uid, sender=msg['From'], subject=msg['Subject'], date=msg['Date'], body=body))
-            print("-" * 40)
     return email_list
 
 
