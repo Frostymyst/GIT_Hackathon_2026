@@ -19,8 +19,22 @@ SMTP_SERVER = os.getenv("SMTP_SERVER", "")
 CALDAV_URL = os.getenv("CALDAV_URL", "")
 
 
+# Email Class
+class Email:
+    def __init__(self, uid: bytes, sender: str, subject: str, date: str, body: str):
+        self.uid = uid
+        self.sender = sender
+        self.subject = subject
+        self.date = date
+        self.body = body
+
+    def __str__(self):
+        return f"UID: {self.uid} | From: {self.sender} | Subject: {self.subject} | Date: {self.date} | Body: {self.body}"
+
+
 # IMAP - Fetch latest emails
 def fetch_emails(n=5):
+    email_list = []
     print("\n=== Fetching Emails (IMAP) ===")
     with imaplib.IMAP4_SSL(IMAP_SERVER) as mail:
         mail.login(EMAIL, SMTP_PASSWORD)
@@ -31,11 +45,21 @@ def fetch_emails(n=5):
         for uid in reversed(latest):
             _, msg_data = mail.fetch(uid, "(RFC822)")
             msg = email.message_from_bytes(msg_data[0][1])
-            print(f"From: {msg['From']}") # Print - Email Sender
-            print(f"Subject: {msg['Subject']}") # Print - Email Subject 
-            print(f"Date: {msg['Date']}") # Print - Email Date
-            print(f"UID: {uid}") # Print - Email UID
+            body = ""
+            if msg.is_multipart():
+                for part in msg.walk():
+                    if part.get_content_type() == "text/plain":
+                        payload = part.get_payload(decode=True)
+                        if isinstance(payload, bytes):
+                            body = payload.decode(errors="replace")
+                        break
+            else:
+                payload = msg.get_payload(decode=True)
+                if isinstance(payload, bytes):
+                    body = payload.decode(errors="replace")
+            email_list.append(Email(uid, msg['From'], msg['Subject'], msg['Date'], body))
             print("-" * 40)
+    return email_list
 
 
 # SMTP - Send a test email
@@ -94,8 +118,11 @@ def create_event(title:str, start:datetime, end:datetime):
     print("Event created.")
 
 
-if __name__ == "__main__":
-    fetch_emails()
-    #send_email()
-    fetch_calendar()
-    #create_event("Event", datetime(2026, 3, 10, 10, 0), datetime(2026, 3, 10, 11, 0))
+
+email_list = fetch_emails()
+for emailMsg in email_list:
+    print(emailMsg)
+
+#send_email()
+fetch_calendar()
+#create_event("Event", datetime(2026, 3, 10, 10, 0), datetime(2026, 3, 10, 11, 0))
