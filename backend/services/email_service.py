@@ -7,6 +7,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import caldav
 from dotenv import load_dotenv
+from schemas.email_schema import emailMsg
 
 load_dotenv()
 
@@ -19,21 +20,8 @@ SMTP_SERVER = os.getenv("SMTP_SERVER", "")
 CALDAV_URL = os.getenv("CALDAV_URL", "")
 
 
-# Email Class
-class Email:
-    def __init__(self, uid: bytes, sender: str, subject: str, date: str, body: str):
-        self.uid = uid
-        self.sender = sender
-        self.subject = subject
-        self.date = date
-        self.body = body
-
-    def __str__(self):
-        return f"From: {self.sender} | Subject: {self.subject} | Date: {self.date}\nBody: {self.body}"
-
-
 # IMAP - Fetch latest emails
-def fetch_emails(n=5):
+def fetch_emails(n: int):
     email_list = []
     print("\n=== Fetching Emails (IMAP) ===")
     with imaplib.IMAP4_SSL(IMAP_SERVER) as mail:
@@ -57,7 +45,7 @@ def fetch_emails(n=5):
                 payload = msg.get_payload(decode=True)
                 if isinstance(payload, bytes):
                     body = payload.decode(errors="replace")
-            email_list.append(Email(uid, msg['From'], msg['Subject'], msg['Date'], body))
+            email_list.append(emailMsg(uid=uid, sender=msg['From'], subject=msg['Subject'], date=msg['Date'], body=body))
             print("-" * 40)
     return email_list
 
@@ -119,10 +107,3 @@ def create_event(title:str, start:datetime, end:datetime):
 
 
 
-if __name__ == "__main__":
-    email_list = fetch_emails()
-    for emailMsg in email_list:
-        print(emailMsg)
-    #send_email()
-    #fetch_calendar()
-    #create_event("Event", datetime(2026, 3, 10, 10, 0), datetime(2026, 3, 10, 11, 0))
