@@ -54,10 +54,6 @@ async def make_new_task(task_data: CreateTaskRequest):
     summary = ai_response.summary
     category = ai_response.category
 
-    print(name)
-    print(summary)
-    print(category)
-
     task_id = create_task(
         name,
         email,
