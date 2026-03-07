@@ -12,10 +12,36 @@ def root():
 @app.get("/ai-test")
 def ai_test():
     ai = LLM()
-    result = ai.handle_new_email(
-        email_content="""
-        Hi there,
-        My name is Jack Koskie, I am emailing about order #12345 that I placed on August 1st. I received the package yesterday but one of the items was damaged. The product is a ceramic vase and it arrived with a large crack in it. I would like to request a return and refund for this item. Please let me know how to proceed with the return process. Thank you.""",
-        valid_tags=["return", "product-issue", "billing", "general-inquiry"],
+
+    TAGS = ["return", "product-issue", "billing", "general-inquiry"]
+    ACTIONS = {
+        "request-info": "You should request the following information from the customer in order to allow support to better assist the customer. Valid fields to request information are: date of purchase, order number, customer name.",
+        "escalate": "This action is to stop responding via a language model and to switch to a human. The information as to why this action will be taken should also be included.",
+        "close-ticket": "If the conversation has been totally resolved and no further communication is necessary, you can include this action to indicate that the ticket should be closed.",
+    }
+
+    email_content = ai.prompt(
+        "Write a sample customer email to a company. The email may be asking for a return, a product issue, a billing issue, or a general inquiry. The email should be somewhat detailed and should be at least a few sentences long. Only include the body of the email, do not include the subject line."
     )
-    return result
+
+    initial_result = ai.handle_new_email(
+        email_content=email_content,
+        valid_tags=TAGS,
+        valid_actions=ACTIONS,
+    )
+
+    print(initial_result)
+
+    ai_response = ai.generate_email_reply(
+        email_content, [], initial_result.tags, initial_result.actions
+    )
+
+    print(ai_response)
+
+    return {
+        "email_content": email_content,
+        "summary": initial_result.summary,
+        "tags": initial_result.tags,
+        "actions": initial_result.actions,
+        "draft_reply": ai_response,
+    }
