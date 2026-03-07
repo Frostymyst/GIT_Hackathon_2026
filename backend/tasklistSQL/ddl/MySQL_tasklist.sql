@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS task(
     summary TEXT,
     description TEXT,
     status VARCHAR(20) NOT NULL,
-    due_date DATE NOT NULL,
+    due_date DATE,
     post_date DATE NOT NULL,
     ordering_access_date DATE NOT NULL,
     assigned_to INT,
