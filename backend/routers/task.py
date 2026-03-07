@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from ..services.starvationOrganizer import fetch_starving_task_ids
+from services.starvationOrganizer import fetch_starving_task_ids
 
 router = APIRouter(prefix="/task", tags=["task"])
 
