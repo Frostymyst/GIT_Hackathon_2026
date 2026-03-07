@@ -1,0 +1,35 @@
+/* TaskPage.css */
+.task-page-container {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  padding: 0;
+}
+
+.task-form-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+@media (max-width: 600px) {
+  .task-page-container {
+    padding: 0 2vw;
+  }
+  .task-form-wrapper {
+    min-height: 40vh;
+  }
+}
+
+@media (max-width: 400px) {
+  .task-page-container {
+    padding: 0 1vw;
+  }
+  .task-form-wrapper {
+    min-height: 20vh;
+  }
+}
