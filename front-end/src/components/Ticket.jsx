@@ -29,7 +29,7 @@ function Ticket(props) {
     }
 
     return (
-        <div className='TaskView'>
+            <div className='TaskView'>
             <div>
                 <h3>
                     {props.title}
@@ -46,22 +46,24 @@ function Ticket(props) {
                     {items ? items:"Error"}
                 </ul>
             </div>
-            <div>
-                
-                    {btns ? 
-                    <form onSubmit={handleAssign} className='AssignForm' id={props.id}>
-                        <select className='AssignSelect' name={props.id} multiple={true}>
-                            <option key={props.user.id} value={props.user.name}>{props.user.name}</option>
-                            {btns}
-                        </select>
-                        <button type='submit'>Assign To</button>
-                    </form>
-                    :
-                    <button onClick={handleSelfAssign} className='AssignBtn' id={props.id}>
-                        Assign Self
-                    </button>}
+            <div className='TaskBtns'>
+                {btns ? 
+                <form onSubmit={handleAssign} className='AssignForm' id={props.id}>
+                    <button type='submit' className='AssignBtn'>Assign To</button>
+                    <select className='AssignSelect' name={props.id} multiple={true} size={3}>
+                        <option key={props.user.id} value={props.user.name}>{props.user.name}</option>
+                        {btns}
+                    </select>
+                </form>
+                :
+                <button onClick={handleSelfAssign} className='AssignBtn' id={props.id}>
+                    Assign Self
+                </button>}
+                <button onClick={handleSelfAssign} className='AssignBtn' id={props.id}>
+                    Drop
+                </button>
             </div>
-        </div>
+            </div>
     )
 }
 
