@@ -1,6 +1,15 @@
 CREATE DATABASE IF NOT EXISTS tasklist;
 USE tasklist;
 
+CREATE TABLE IF NOT EXISTS dept(
+    dno INT PRIMARY KEY AUTO_INCREMENT,
+    dname VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS task_categories (
+    cname VARCHAR(50) PRIMARY KEY
+);
+
 CREATE TABLE IF NOT EXISTS employees(
     eno INT PRIMARY KEY AUTO_INCREMENT,
     ename VARCHAR(50) NOT NULL,
@@ -11,10 +20,8 @@ CREATE TABLE IF NOT EXISTS employees(
     salary DECIMAL(10, 2) NOT NULL,
     title VARCHAR(50) NOT NULL,
     dno INT NOT NULL,
-
-    PRIMARY KEY (eno),
     FOREIGN KEY (dno) REFERENCES dept(dno)
-)
+);
 
 CREATE TABLE IF NOT EXISTS task(
     tno INT PRIMARY KEY AUTO_INCREMENT,
@@ -26,19 +33,10 @@ CREATE TABLE IF NOT EXISTS task(
     post_date DATE NOT NULL,
     last_accessed_date DATE NOT NULL,
     assigned_to INT,
-    categories VARCHAR(255),
+    categories VARCHAR(50),
 
     FOREIGN KEY (assigned_to) REFERENCES employees(eno),
     FOREIGN KEY (categories) REFERENCES task_categories(cname)
-)
-
-CREATE TABLE IF NOT EXISTS task_categories (
-    cname VARCHAR(50) PRIMARY KEY
-);
-
-CREATE TABLE IF NOT EXISTS dept(
-    dno INT PRIMARY KEY AUTO_INCREMENT,
-    dname VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS workson(
