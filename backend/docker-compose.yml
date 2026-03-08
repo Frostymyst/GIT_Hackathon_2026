@@ -36,5 +36,12 @@ services:
             tasklist-mysql:
                 condition: service_healthy
 
+    frontend:
+        build: ../front-end
+        container_name: hackathon-frontend
+        restart: always
+        ports:
+            - "80:80"
+
 volumes:
     mysql-db:
