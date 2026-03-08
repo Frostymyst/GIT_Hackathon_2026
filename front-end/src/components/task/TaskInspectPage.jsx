@@ -291,6 +291,11 @@ function TaskInspectPage({ user, taskId, onNavigate, onLogout }) {
               </div>
               <form className='task-inspect-item task-inspect-item-wide' onSubmit={handleEmail}>
                 <span className="task-inspect-label">Reply to Customer</span>
+                {task.email && (
+                  <p className="task-email-recipient">
+                    <span>To:</span> {task.email}
+                  </p>
+                )}
                 <textarea name="emailContent" className='task-email-area' placeholder='Dear Mr/Ms/Mrs/Mx...' required>
                 </textarea>
                 <button type='submit' className='EmailSend'>Send</button>

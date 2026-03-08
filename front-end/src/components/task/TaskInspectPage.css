@@ -212,3 +212,14 @@
   border-radius: 4px;
   min-height: 10rem;
 }
+
+.task-email-recipient {
+  margin: 2px 0 4px;
+  color: #2b4967;
+  font-size: 0.92rem;
+}
+
+.task-email-recipient span {
+  font-weight: 700;
+  color: #1f344f;
+}
