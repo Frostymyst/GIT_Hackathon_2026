@@ -25,6 +25,10 @@
     font-weight: 500;
 }
 
+.TaskInfo {
+    max-width: 40%;
+}
+
 .AssignBtn {
     padding: 10px;
     margin: auto 15px;
