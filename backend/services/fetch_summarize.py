@@ -10,7 +10,7 @@ DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
 STATE_FILE = os.path.join(DATA_DIR, "last_email.json")
 
 FETCH_BATCH = 5
-MAX_FETCH = 5
+MAX_FETCH = 10
 
 
 def load_state() -> dict:
@@ -46,6 +46,7 @@ def process_batch(batch: list, ai: LLM, dry_run: bool = False):
                     category=result.category,
                 )
                 print(f"Task created: {result.name}")
+                
         except Exception as ex:
             print(f"Failed to process email uid={e.uid}: {ex}")
 
