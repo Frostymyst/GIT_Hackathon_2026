@@ -16,16 +16,18 @@ function MainList({ user, onNavigate, onLogout }) {
     }
 
     const handleSort = (event) => {
-        let cat = event.target.id;
+        let cat = "http://127.0.0.1:8000/task?category="+event.target.id;
         const catReq = new XMLHttpRequest();
-        catReq.open("GET", "http://127.0.0.1:8000/task/category/"+cat)
-        catReq.send()
-
+        console.log(cat)
         catReq.onload = () => {
-            let cats = JSON.parse(req.responseText).tasks;
-            tickets = cats.map((e) => <Ticket user={user} title={e.name} desc={e.summary} keywords={e.categories} id={e.tno}/>)
+            let cats = JSON.parse(req.responseText);
+            console.log(cats)
+            tickets = cats.tasks.map((e) => <Ticket user={user} title={e.name} desc={e.summary} keywords={e.categories} id={e.tno}/>)
             console.log(cats)
         }
+
+        catReq.open("GET", cat)
+        catReq.send()
     }
 
     cate.onload = () => {
