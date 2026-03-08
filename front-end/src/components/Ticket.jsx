@@ -20,7 +20,7 @@ function Ticket(props) {
     }, [msg]);
 
     let items;
-    if (props.keywords != false) {
+    if (props.keywords) {
         items = props.keywords.map(e => <li key={e}>{e}</li>)
     }
     let btns;

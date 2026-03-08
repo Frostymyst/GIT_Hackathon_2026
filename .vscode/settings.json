@@ -3,5 +3,52 @@
     "editor.defaultFormatter": "ms-python.black-formatter",
     "editor.formatOnSave": true,
     "editor.tabSize": 4
-  }
+  },
+  "sqltools.connections": [
+    {
+      "mysqlOptions": {
+        "authProtocol": "default",
+        "enableSsl": "Disabled"
+      },
+      "ssh": "Disabled",
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 3309,
+      "driver": "MySQL",
+      "name": "Hackathon test",
+      "database": "tasklist",
+      "username": "tasklist",
+      "askForPassword": true
+    },
+    {
+      "mysqlOptions": {
+        "authProtocol": "default",
+        "enableSsl": "Disabled"
+      },
+      "ssh": "Disabled",
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 3306,
+      "driver": "MySQL",
+      "name": "tasklist",
+      "database": "tasklist",
+      "username": "tasklist",
+      "password": "password"
+    },
+    {
+      "mysqlOptions": {
+        "authProtocol": "default",
+        "enableSsl": "Disabled"
+      },
+      "ssh": "Disabled",
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 3309,
+      "driver": "MySQL",
+      "name": "tasklist1",
+      "database": "tasklist",
+      "username": "tasklist",
+      "password": "password"
+    }
+  ]
 }

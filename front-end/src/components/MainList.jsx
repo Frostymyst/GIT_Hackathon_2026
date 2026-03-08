@@ -1,17 +1,23 @@
 import Header from './Header'
 import './MainList.css'
+import Ticket from './Ticket';
 
 function MainList({ user, onNavigate }) {
     // eslint-disable-next-line no-unused-vars
     let tickets;
     const req = new XMLHttpRequest();
     req.onload = () => {
-        console.log(req)
-        tickets = req
+        let taskResp = JSON.parse(req.responseText).tasks;
+        tickets = taskResp.map((e) => <Ticket user={user} title={e.name} desc={e.summary} keywords={e.categories} id={e.tno}/>)
     }
 
-    req.open("GET", "http://localhost:8000/task")
+    req.open("GET", "http://localhost:8000/task", false)
     req.send()
+    /*req.setRequestHeader("Content-Type", "application/json")
+    req.send(JSON.stringify({
+        email:"test@example.com",
+        description:"dsa",
+    }))*/
 
   return (
     <>
@@ -19,7 +25,7 @@ function MainList({ user, onNavigate }) {
     <table id='Layout'>
         <tbody>
             <tr>
-                <td id='SearchDiv' colSpan={2}>
+                <td id='SearchDiv'>
                     <h4>
                         Search for a Specific Ticket
                     </h4>
@@ -28,7 +34,7 @@ function MainList({ user, onNavigate }) {
 
                     </datalist>
                 </td>
-                <td id='TagDiv' colSpan={4}>
+                <td id='TagDiv'>
                     <div id='Tags'>
                         <h4>
                             Filter by Tags/Keywords:
@@ -48,6 +54,7 @@ function MainList({ user, onNavigate }) {
             </tr>
         </tbody>
     </table>
+    {tickets}
     </>
   )
 }
