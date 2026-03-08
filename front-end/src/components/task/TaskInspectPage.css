@@ -108,3 +108,21 @@
     grid-template-columns: 1fr;
   }
 }
+
+.EmailSend {
+  border: 1px solid #3d9970;
+  background: #f3fbf7;
+  color: #215941;
+  border-radius: 9px;
+  padding: 8px 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.42rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.EmailSend:hover {
+  filter: brightness(0.98);
+}
