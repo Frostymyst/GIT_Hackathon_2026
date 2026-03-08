@@ -30,7 +30,7 @@ function Ticket(props) {
 
     return (
             <div className='TaskView'>
-            <div>
+            <div className='TaskInfo'>
                 <h3>
                     {props.title}
                 </h3>

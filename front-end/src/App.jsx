@@ -68,7 +68,7 @@ function App() {
     setScreen('login');
   };
 
-  if (!currentUser && screen !== 'signup' && screen !== 'login') {
+  /*if (!currentUser && screen !== 'signup' && screen !== 'login') {
     return (
       <Login
         onShowSignup={() => setScreen('signup')}
@@ -92,7 +92,7 @@ function App() {
         onLoginSuccess={handleLoginSuccess}
       />
     );
-  }
+  }*/
 
   return (
     <>
