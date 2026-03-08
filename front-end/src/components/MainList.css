@@ -1,6 +1,65 @@
 #Layout {
     width: 95%;
-    border: 2px black solid;
     height: 80%;
+    margin: 20px auto;
+}
+
+#Layout td {
+    padding: 8px 10px;
+    border: 2px black solid;
     margin: auto;
+    max-width: 90%;
+    height: 7rem;
+}
+
+#Layout a {
+    color: black;
+    text-decoration: none;
+}
+
+#SearchDiv form {
+    display: flex;
+    justify-content: flex-start;
+    text-align: left;
+    flex-direction: column;
+}
+
+#SearchDiv form label h4 {
+    margin: 10px 0;
+}
+
+#SearchDiv form input {
+    width: 80%;
+	padding: 8px 10px;
+	font-size: 1rem;
+	border: 2px solid #aaa;
+	border-radius: 3px;
+	background: #eaeaea;
+	margin-bottom: 6px;
+	box-sizing: border-box;
+}
+
+#TagDiv {
+    display: flex;
+    justify-content: space-between;
+}
+
+#Tags {
+    text-align: left;
+}
+
+#Tags ul {
+    list-style-type: none;
+    padding-left: 0%;
+}
+
+#Tags ul li {
+    border: 2px black solid;
+    background-color: azure;
+    border-radius: 5px;
+    display: inline;
+    margin: 0.2rem;
+    padding: 0.4rem;
+    font-weight: 500;
+    cursor: pointer;
 }
