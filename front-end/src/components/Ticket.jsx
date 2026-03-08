@@ -3,6 +3,12 @@ import React from 'react';
 import './Ticket.css';
 
 function Ticket(props) {
+        const handleInspect = () => {
+            if (props.onInspect) {
+                props.onInspect(props.id);
+            }
+        }
+
     let [msg, setMsg] = useState("")
 
     const handleAssign = (event) => {
@@ -31,8 +37,10 @@ function Ticket(props) {
     return (
             <div className='TaskView'>
             <div className='TaskInfo'>
-                <h3>
-                    {props.title}
+                <h3 className='TaskTitle'>
+                    <button type='button' className='InspectLink' onClick={handleInspect}>
+                        {props.title}
+                    </button>
                 </h3>
                 <p className='TaskDescription'>
                     {props.desc}

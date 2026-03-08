@@ -5,7 +5,7 @@ import Ticket from './Ticket';
 
 
 function MainList({ user, onNavigate, onLogout }) {
-    let [tickets, setTickets] = useState([]); 
+    let [tasks, setTasks] = useState([]); 
     let [ids, setIds] = useState([]); 
     let [tags, setTags] = useState([]);
 
@@ -16,7 +16,7 @@ function MainList({ user, onNavigate, onLogout }) {
         catReq.onload = () => {
             let cats = JSON.parse(catReq.responseText);
             console.log(cats)
-            setTickets(cats.tasks.map((e) => <Ticket user={user} title={e.name} desc={e.summary} keywords={e.categories} id={e.tno}/>))
+            setTasks(cats.tasks || []);
         }
 
         catReq.open("GET", cat)
@@ -28,12 +28,9 @@ function MainList({ user, onNavigate, onLogout }) {
         const req = new XMLHttpRequest();
         req.onload = () => {
             const taskResp = JSON.parse(req.responseText).tasks;
-            setTickets(taskResp.map((e) => <Ticket user={user} title={e.name} desc={e.summary} keywords={e.categories} id={e.tno} />));
+            setTasks(taskResp || []);
             setIds(taskResp.map((e) => (
-                <>
-                    <option>{e.tno}</option>
-                    <option>{e.name}</option>
-                </>
+                <option key={`task-id-${e.tno}`} value={String(e.tno)}>{e.tno}</option>
             )));
         };
         req.open("GET", "http://127.0.0.1:8000/task");
@@ -89,7 +86,17 @@ function MainList({ user, onNavigate, onLogout }) {
             </tr>
         </tbody>
     </table>
-    {tickets}
+        {tasks.map((task) => (
+            <Ticket
+                key={task.tno}
+                user={user}
+                title={task.name}
+                desc={task.summary}
+                keywords={task.categories}
+                id={task.tno}
+                onInspect={(taskId) => onNavigate && onNavigate('task-detail', { taskId })}
+            />
+        ))}
     </>
   )
 }

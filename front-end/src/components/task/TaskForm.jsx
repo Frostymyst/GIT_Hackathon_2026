@@ -3,6 +3,7 @@ import TaskInput from './TaskInput';
 import TaskTextarea from './TaskTextarea';
 import TaskSelect from './TaskSelect';
 import TaskFormFooter from './TaskFormFooter';
+import { createTask } from '../../api/taskApi';
 import './TaskForm.css';
 
 const priorityOptions = [
@@ -39,20 +40,71 @@ function TaskForm() {
     dueDate: '',
     category: '',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
+  const [formSuccess, setFormSuccess] = useState('');
 
   function handleChange(e) {
     const { id, value } = e.target;
     setForm({ ...form, [id]: value });
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    // TODO: Add validation and backend integration
-    alert('Task created!');
+
+    setFormError('');
+    setFormSuccess('');
+
+    if (!form.description.trim()) {
+      setFormError('Task description is required.');
+      return;
+    }
+
+    let dueTimestamp = null;
+    if (form.dueDate) {
+      const dueDate = new Date(`${form.dueDate}T00:00:00`);
+      if (Number.isNaN(dueDate.getTime())) {
+        setFormError('Due date is invalid.');
+        return;
+      }
+      dueTimestamp = Math.floor(dueDate.getTime() / 1000);
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const normalizedDescription = form.title.trim()
+        ? `${form.title.trim()}\n\n${form.description.trim()}`
+        : form.description.trim();
+
+      const response = await createTask({
+        email: form.contact.trim() || null,
+        description: normalizedDescription,
+        due_date: dueTimestamp,
+      });
+
+      setFormSuccess(`Task created successfully (ID: ${response?.task_id ?? 'new'}).`);
+      setForm({
+        title: '',
+        description: '',
+        contact: '',
+        priority: '',
+        assignedTo: '',
+        dueDate: '',
+        category: '',
+      });
+    } catch (error) {
+      setFormError(error.message || 'Unable to create task right now.');
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
     <form className="task-form" onSubmit={handleSubmit}>
+      {formError && <p className="task-form-message task-form-message-error">{formError}</p>}
+      {formSuccess && <p className="task-form-message task-form-message-success">{formSuccess}</p>}
+
       <TaskInput
         label="Task Title"
         id="title"
@@ -116,7 +168,7 @@ function TaskForm() {
         onChange={handleChange}
         required
       />
-      <TaskFormFooter />
+      <TaskFormFooter isSubmitting={isSubmitting} />
     </form>
   );
 }

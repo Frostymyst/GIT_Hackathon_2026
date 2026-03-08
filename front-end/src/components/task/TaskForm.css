@@ -28,6 +28,26 @@
   align-items: start;
 }
 
+.task-form-message {
+  margin: 0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  border: 1px solid transparent;
+}
+
+.task-form-message-error {
+  color: #842029;
+  background: #f9d8dc;
+  border-color: #f1afb7;
+}
+
+.task-form-message-success {
+  color: #164f31;
+  background: #d8f5e5;
+  border-color: #a8e9c6;
+}
+
 .task-input-group {
   display: flex;
   flex-direction: column;
@@ -143,6 +163,13 @@ select.task-input {
 .task-submit-btn:active {
   transform: translateY(0);
   box-shadow: 0 8px 18px rgba(61, 153, 112, 0.26);
+}
+
+.task-submit-btn:disabled {
+  opacity: 0.72;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 8px 18px rgba(61, 153, 112, 0.2);
 }
 
 @media (max-width: 600px) {

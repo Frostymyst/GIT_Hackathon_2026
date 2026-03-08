@@ -5,6 +5,7 @@ import MainList from './components/MainList.jsx';
 import AdminPanel from './components/admin/AdminPanel.jsx';
 import TaskPage from './components/task/TaskPage.jsx';
 import CalendarPage from './components/calendar/CalendarPage.jsx';
+import TaskInspectPage from './components/task/TaskInspectPage.jsx';
 import { clearAuthToken, clearAuthenticatedEmployee, getAuthenticatedEmployee } from './api/authApi';
 import './App.css';
 
@@ -39,8 +40,12 @@ function App() {
     normalizeEmployee(getAuthenticatedEmployee())
   );
   const [screen, setScreen] = useState(currentUser ? 'main' : 'login');
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
 
-  const handleNavigate = (nextScreen) => {
+  const handleNavigate = (nextScreen, payload = {}) => {
+    if (nextScreen === 'task-detail') {
+      setSelectedTaskId(payload.taskId ?? null);
+    }
     setScreen(nextScreen);
   };
 
@@ -89,6 +94,17 @@ function App() {
 
   if (screen === 'calendar') {
     return <CalendarPage user={user} onNavigate={handleNavigate} onLogout={handleLogout} />;
+  }
+
+  if (screen === 'task-detail') {
+    return (
+      <TaskInspectPage
+        user={user}
+        taskId={selectedTaskId}
+        onNavigate={handleNavigate}
+        onLogout={handleLogout}
+      />
+    );
   }
 
   if (screen === 'signup') {

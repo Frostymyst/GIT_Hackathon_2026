@@ -29,6 +29,26 @@
     max-width: 40%;
 }
 
+.TaskTitle {
+    margin: 0;
+}
+
+.InspectLink {
+    border: none;
+    padding: 0;
+    background: none;
+    color: #1f2937;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: left;
+}
+
+.InspectLink:hover {
+    text-decoration: underline;
+    color: #3d9970;
+}
+
 .AssignBtn {
     padding: 10px;
     margin: auto 15px;
