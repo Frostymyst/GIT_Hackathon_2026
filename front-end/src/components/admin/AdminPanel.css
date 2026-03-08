@@ -27,12 +27,20 @@
   letter-spacing: 0.08em;
   font-size: 0.78rem;
   font-weight: 700;
-  color: #1d4ed8;
+  color: #3d9970;
 }
 
 .admin-title {
   margin: 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   font-size: 2.1rem;
+}
+
+.admin-title i {
+  color: #3d9970;
+  font-size: 1.6rem;
 }
 
 .admin-subtitle {
@@ -57,7 +65,15 @@
 
 .admin-card-title {
   margin: 0 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 1.1rem;
+}
+
+.admin-card-title i {
+  color: #3d9970;
+  font-size: 1rem;
 }
 
 .admin-card-body {
@@ -105,6 +121,10 @@
   cursor: pointer;
 }
 
+.admin-btn i {
+  margin-right: 0.45rem;
+}
+
 .admin-btn:hover {
   filter: brightness(1.08);
 }
@@ -129,6 +149,10 @@
   font-size: 0.92rem;
 }
 
+.admin-file-input-hidden {
+  display: none;
+}
+
 .admin-table {
   width: 100%;
   border-collapse: collapse;
@@ -146,8 +170,8 @@
 }
 
 .admin-table th {
-  background: #eff6ff;
-  color: #1e3a8a;
+  background: #ecfdf3;
+  color: #3d9970;
 }
 
 @media (max-width: 900px) {

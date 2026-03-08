@@ -163,7 +163,7 @@ function Signup({ onShowLogin }) {
                     {isSubmitting ? 'Creating account...' : 'Signup'}
                 </button>
 
-                <p className="signup-link">
+                <p className="signup-link" style={{ textAlign: 'center', width: '100%' }}>
                     Already have an account? <a href="#" onClick={handleShowLogin}>Sign in</a>
                 </p>
             </form>

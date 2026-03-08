@@ -1,0 +1,156 @@
+.calendar-page {
+  min-height: 100vh;
+  background: linear-gradient(to top right, #f3f7fb 0%, #f0f8f4 60%, #e7f4ec 100%);
+}
+
+.calendar-main {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 18px 16px 30px;
+}
+
+.calendar-hero {
+  margin-bottom: 14px;
+  text-align: left;
+}
+
+.calendar-eyebrow {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #3d9970;
+}
+
+.calendar-title {
+  margin: 6px 0;
+  font-size: 2rem;
+  color: #132235;
+}
+
+.calendar-subtitle {
+  margin: 0;
+  color: #516478;
+}
+
+.calendar-layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 440px) minmax(320px, 1fr);
+  gap: 16px;
+}
+
+.calendar-card {
+  background: #ffffff;
+  border: 1px solid #d8e2ef;
+  border-radius: 14px;
+  box-shadow: 0 10px 22px rgba(15, 39, 70, 0.1);
+  padding: 14px;
+}
+
+.task-calendar {
+  width: 100%;
+  border: none;
+  font-family: 'Manrope', 'Avenir Next', 'Segoe UI', sans-serif;
+}
+
+.task-calendar .react-calendar__tile--active {
+  background: #3d9970;
+  color: #ffffff;
+}
+
+.task-calendar .react-calendar__tile--active:enabled:hover,
+.task-calendar .react-calendar__tile--active:enabled:focus {
+  background: #3d9970;
+}
+
+.task-calendar-due-day {
+  position: relative;
+}
+
+.task-calendar-due-day::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 6px;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #3d9970;
+  transform: translateX(-50%);
+}
+
+.due-list-title {
+  margin: 0 0 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #132235;
+}
+
+.due-list-title i {
+  color: #3d9970;
+}
+
+.calendar-message {
+  margin: 0;
+  color: #516478;
+}
+
+.due-task-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.due-task-item {
+  border: 1px solid #d8e2ef;
+  border-radius: 10px;
+  padding: 9px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.due-task-name {
+  font-weight: 600;
+  color: #12263f;
+}
+
+.due-task-status {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-weight: 700;
+}
+
+.due-task-status-new {
+  background: #e8f3ff;
+  color: #1d4ed8;
+}
+
+.due-task-status-in-progress {
+  background: #fff7e6;
+  color: #b45309;
+}
+
+.due-task-status-delayed {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.due-task-status-completed {
+  background: #ecfdf3;
+  color: #166534;
+}
+
+@media (max-width: 900px) {
+  .calendar-layout {
+    grid-template-columns: 1fr;
+  }
+}
