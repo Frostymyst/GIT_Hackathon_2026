@@ -1,89 +1,187 @@
 #Layout {
-    width: 95.8%;
-    height: 80%;
-    margin: 20px auto;
+    width: min(1180px, 95%);
+    margin: 16px auto 20px;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+#Layout tbody,
+#Layout tr {
+    width: 100%;
+    display: block;
+}
+
+#Layout tr {
+    display: grid;
+    grid-template-columns: 1.2fr 1.8fr;
+    gap: 14px;
 }
 
 #Layout td {
-    padding: 8px 10px;
-    border: 2px black solid;
-    margin: auto;
-    max-width: 90%;
-    height: 7rem;
-}
-
-#Layout a {
-    color: black;
-    text-decoration: none;
+    padding: 14px;
+    border: 1px solid #d7e3ef;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 10px 22px rgba(13, 33, 59, 0.08);
+    box-sizing: border-box;
+    min-height: 122px;
 }
 
 #SearchDiv form {
     display: flex;
-    justify-content: flex-start;
-    text-align: left;
     flex-direction: column;
+    text-align: left;
+    gap: 9px;
 }
 
-#SearchDiv form label h4 {
-    margin: 10px 0;
+#SearchDiv form label h4,
+#Tags h4 {
+    margin: 0;
+    font-size: 1rem;
+    letter-spacing: 0.01em;
+    color: #1f344f;
 }
 
 #SearchDiv form input {
-    width: 80%;
-	padding: 8px 10px;
-	font-size: 1rem;
-	border: 2px solid #aaa;
-	border-radius: 3px;
-	background: #eaeaea;
-	margin-bottom: 6px;
-	box-sizing: border-box;
+    width: 100%;
+    min-height: 46px;
+    padding: 10px 12px;
+    font-size: 0.98rem;
+    border: 1.5px solid #bfccdc;
+    border-radius: 10px;
+    background: #f8fbff;
+    color: #10243d;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+#SearchDiv form input:focus {
+    outline: none;
+    border-color: #3d9970;
+    box-shadow: 0 0 0 4px rgba(61, 153, 112, 0.16);
+    background: #ffffff;
 }
 
 #TagDiv {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    float: right;
-    width: 70%;
+    gap: 12px;
 }
 
 #Tags {
     text-align: left;
+    flex: 1;
 }
 
-#Tags ul {
-    list-style-type: none;
-    padding-left: 0%;
+#TagList {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
-#Tags ul li {
-    border: 2px black solid;
-    background-color: azure;
-    border-radius: 5px;
-    display: inline;
-    margin: 0.2rem;
-    padding: 0.4rem;
-    font-weight: 500;
+#TagList li {
+    border: 1px solid #cfe0f1;
+    background: #f6fbff;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 11px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #244260;
     cursor: pointer;
+    transition: transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease;
 }
 
-#CreateBtn {
-    padding: 10px;
-    margin: auto auto;
-    font-size: 1.1rem;
-	background: #fff;
-	border: 2px solid #222;
-	border-radius: 6px;
-	box-shadow: 2px 2px 0 #888;
-	cursor: pointer;
-	transition: background 0.2s;
-}
-#CreateBtn:hover {
-    background: #f0f0f0;
+#TagList li:hover {
+    transform: translateY(-1px);
+    background: #edf8f2;
+    border-color: #b9dbc9;
 }
 
 #CreateDiv {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-right: 20px;
+}
+
+#CreateBtn {
+    min-height: 46px;
+    padding: 0 15px;
+    font-size: 0.96rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #3d9970 0%, #3d9970 100%);
+    color: #ffffff;
+    border: 1px solid #3d9970;
+    border-radius: 10px;
+    box-shadow: 0 9px 18px rgba(61, 153, 112, 0.24);
+    cursor: pointer;
+    transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.2s ease;
+}
+
+#CreateBtn:hover {
+    filter: brightness(1.03);
+    transform: translateY(-1px);
+    box-shadow: 0 12px 22px rgba(61, 153, 112, 0.3);
+}
+
+#CreateBtn:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 900px) {
+    #Layout tr {
+        grid-template-columns: 1fr;
+    }
+
+    #TagDiv {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    #CreateDiv {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+.list-page-hero {
+    width: min(1180px, 95%);
+    margin: 16px auto 10px;
+    text-align: left;
+}
+
+.list-page-eyebrow {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #3d9970;
+}
+
+.list-page-title {
+    margin: 6px 0;
+    font-size: 1.85rem;
+    color: #132235;
+}
+
+.list-page-subtitle {
+    margin: 0;
+    color: #516478;
+}
+
+.list-empty-message {
+    width: min(1180px, 95%);
+    margin: 8px auto 0;
+    border: 1px dashed #c9d8e8;
+    border-radius: 12px;
+    padding: 14px;
+    background: #ffffff;
+    color: #516478;
+    text-align: center;
 }

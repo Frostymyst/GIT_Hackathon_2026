@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS task(
     ordering_access_date DATE NOT NULL,
     assigned_to INT,
     categories VARCHAR(50),
+    CONSTRAINT chk_task_single_category CHECK (categories IS NULL OR categories NOT LIKE '%,%'),
 
     FOREIGN KEY (assigned_to) REFERENCES employees(eno),
     FOREIGN KEY (categories) REFERENCES task_categories(cname)

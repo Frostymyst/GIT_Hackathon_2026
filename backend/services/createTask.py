@@ -18,6 +18,12 @@ def insert_task(
     category: str | None = None,
 ) -> int:
     """Insert a new task row and return the generated task ID (tno)."""
+    if category is not None:
+        normalized_category = category.strip()
+        if "," in normalized_category:
+            raise ValueError("Task category must be a single value")
+        category = normalized_category
+
     columns = [
         "summary",
         "description",
@@ -78,7 +84,7 @@ def create_task(
     try:
         connection = mysql.connector.connect(
             host=os.getenv("MYSQL_HOST", "127.0.0.1"),
-            port=int(os.getenv("MYSQL_PORT", "3309")),
+            port=int(os.getenv("MYSQL_PORT", "3306")),
             user=os.getenv("MYSQL_USER", "tasklist"),
             password=os.getenv("MYSQL_PASSWORD", "password"),
             database=os.getenv("MYSQL_DB", "tasklist"),

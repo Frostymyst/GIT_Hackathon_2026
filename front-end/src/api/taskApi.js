@@ -11,4 +11,19 @@ function getTasks(params = {}) {
   return request(`/task/${suffix}`);
 }
 
-export { getTasks };
+function getTaskById(taskId) {
+  return request(`/task/${taskId}`);
+}
+
+function createTask(payload) {
+  return request('/task/', {
+    method: 'POST',
+    body: {
+      email: payload?.email || null,
+      description: payload?.description || '',
+      due_date: payload?.due_date ?? null,
+    },
+  });
+}
+
+export { getTasks, getTaskById, createTask };
