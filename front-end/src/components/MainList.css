@@ -1,5 +1,5 @@
 #Layout {
-    width: 95%;
+    width: 95.8%;
     height: 80%;
     margin: 20px auto;
 }
@@ -42,6 +42,8 @@
 #TagDiv {
     display: flex;
     justify-content: space-between;
+    float: right;
+    width: 70%;
 }
 
 #Tags {
