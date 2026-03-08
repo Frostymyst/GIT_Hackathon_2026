@@ -1,8 +1,7 @@
 import Header from './Header'
 import './MainList.css'
 
-// eslint-disable-next-line no-unused-vars
-function MainList(props) {
+function MainList({ user, onNavigate }) {
     // eslint-disable-next-line no-unused-vars
     let tickets;
     const req = new XMLHttpRequest();
@@ -14,21 +13,9 @@ function MainList(props) {
     req.open("GET", "http://localhost:8000/task")
     req.send()
 
-    const User = {
-    id:1,
-    name:"Matt",
-    auth:3,
-    employees: [
-      "Sawyer",
-      "Zaki",
-      "Ethan",
-      "Kelvin"
-    ]
-  }
-
   return (
     <>
-    <Header user={User} />
+        <Header user={user} onNavigate={onNavigate} activeView="main" />
     <table id='Layout'>
         <tbody>
             <tr>

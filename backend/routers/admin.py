@@ -3,6 +3,7 @@ import mysql.connector
 from pydantic import BaseModel
 from services.adminSetCategories import create_category, delete_category
 from services.adminSetDepartments import create_department, delete_department
+from services.adminSetEmployees import create_employee, delete_employee
 from database import connection
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -14,6 +15,17 @@ class CategoryRequest(BaseModel):
 
 class DepartmentRequest(BaseModel):
     dname: str
+
+
+class EmployeeRequest(BaseModel):
+    ename: str
+    email: str
+    epassword: str
+    phonenumber: str
+    bdate: str
+    salary: float
+    title: str
+    dno: int
 
 
 @router.get("/categories")
@@ -98,3 +110,62 @@ async def remove_department(dname: str):
         return {"status": "OK", "deleted": True}
     except RuntimeError as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@router.post("/")
+async def add_employee(payload: EmployeeRequest):
+    """Create a new employee."""
+    try:
+        created = create_employee(
+            ename=payload.ename,
+            email=payload.email,
+            epassword=payload.epassword,
+            phonenumber=payload.phonenumber,
+            bdate=payload.bdate,
+            salary=payload.salary,
+            title=payload.title,
+            dno=payload.dno,
+        )
+        return {"status": "OK", "created": created}
+    except RuntimeError as exc:
+        if "Duplicate entry" in str(exc):
+            raise HTTPException(
+                status_code=409, detail="Employee already exists"
+            ) from exc
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@router.get("/{employee_id}")
+async def get_employee(employee_id: int):
+    """Get employee by ID"""
+    sql, cursor = connection()
+    try:
+        cursor.execute("SELECT * FROM employees WHERE eno = %s", (employee_id,))
+        employee = cursor.fetchone()
+        if employee:
+            return {"status": "OK", "employee": employee}
+        raise HTTPException(status_code=404, detail="Employee not found")
+    except mysql.connector.Error as err:
+        raise HTTPException(status_code=500, detail=str(err)) from err
+    finally:
+        if sql.is_connected():
+            cursor.close()
+            sql.close()
+
+
+@router.delete("/{employee_id}")
+async def remove_employee(employee_id: int):
+    """Delete employee by ID"""
+    try:
+        deleted = delete_employee(eno=employee_id)
+        if not deleted:
+            raise HTTPException(status_code=404, detail="Employee not found")
+        return {"status": "OK", "deleted": True}
+    except RuntimeError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@router.patch("/{employee_id}")
+async def update_employee(employee_id: int):
+    """Update employee by ID"""
+    # TODO
