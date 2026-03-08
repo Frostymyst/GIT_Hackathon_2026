@@ -154,6 +154,8 @@ function Ticket(props) {
         items = <li key={props.keywords}>{props.keywords}</li>
     }
 
+    let desc = props.desc.split(".")
+
     return (
         <div className='TaskView'>
             <div className='TaskInfo'>
@@ -163,7 +165,7 @@ function Ticket(props) {
                     </button>
                 </h3>
                 <p className='TaskDescription'>
-                    {props.desc}
+                    {desc[0] + "."}
                 </p>
                 <p className='AssignedToText'>
                     <span>Assigned To:</span> {assignedTo}
