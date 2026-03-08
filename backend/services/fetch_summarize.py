@@ -1,16 +1,20 @@
 import json
 import os
+import re
+
 from datetime import datetime, timezone
 
-from services.email_service import fetch_emails
+from services.email_service import fetch_emails, send_email
 from services.llm import LLM
-from services.createTask import create_task
+from services.createTask import create_task, update_task
+from database import connection
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
 STATE_FILE = os.path.join(DATA_DIR, "last_email.json")
 
 FETCH_BATCH = 5
 MAX_FETCH = 10
+MAX_AI_EMAILS_PER_TASK = 2
 
 
 def load_state() -> dict:
@@ -28,25 +32,138 @@ def save_state(uid: str, time: str):
 
 def process_batch(batch: list, ai: LLM, dry_run: bool = False):
     for e in batch:
+        existing_task = None
+        # TODO: Remove this prior to prod
+        if e.sender != "Talon Lusk <talonstevelusk@gmail.com>":
+            continue
         content = f"From: {e.sender}\nSubject: {e.subject}\nDate: {e.date}\n\n{e.body}"
+
+        if "(ID:" in e.subject:
+            match = re.search(r"\(ID:\s*(\d+)\)", e.subject)
+            existing_task = int(match.group(1)) if match else None
+
+        DESCRIPTION_SEP = "\n\n--- Next message in thread ---\n\n"
+        sql, cursor = connection()
+        existing_description = ""
         try:
-            result = ai.handle_new_email(content, valid_categories=['general'], valid_actions={})
-            if dry_run:
-                print(f"[DRY RUN] uid={e.uid.decode()}")
-                print(f"  name:     {result.name}")
-                print(f"  summary:  {result.summary}")
-                print(f"  category: {result.category}")
-            else:
-                create_task(
-                    name=result.name,
-                    email=e.sender,
-                    summary=result.summary,
-                    description=content,
-                    due_date=None,
-                    category=result.category,
+            cursor.execute("SELECT cname FROM task_categories")
+            categories = [str(row["cname"]) for row in cursor.fetchall()]
+            if existing_task is not None:
+                cursor.execute(
+                    "SELECT description FROM task WHERE tno = %s",
+                    (existing_task,),
                 )
-                print(f"Task created: {result.name}")
-                
+                row = cursor.fetchone()
+                if row:
+                    existing_description = row["description"] or ""
+            existing_ai_reply_count = existing_description.count(DESCRIPTION_SEP)
+        except Exception as exc:
+            print(f"Failed to fetch categories: {exc}")
+            categories = []
+        finally:
+            cursor.close()
+            if sql.is_connected():
+                sql.close()
+
+        try:
+            result = ai.handle_new_email(
+                content,
+                valid_categories=categories,
+                # TODO: Add more actions here
+                valid_actions={"insufficient-information": "Request more"},
+            )
+            print(f"raw actions: {result.actions}")
+            if dry_run:
+                task_id = 1
+                body = ai.generate_email_reply(content, result.category, result.actions)
+                print(e.sender, f"Re: {e.subject}", task_id, body)
+                send_email(e.sender, f"Re: {e.subject}", task_id, body, e.message_id)
+            else:
+                actions = result.actions
+
+                if existing_task is not None:
+                    combined_description = (
+                        (existing_description or "") + DESCRIPTION_SEP + content
+                    )
+                    at_ai_email_limit = (
+                        existing_ai_reply_count >= MAX_AI_EMAILS_PER_TASK
+                    )
+                    if not actions:
+                        status = "new"
+                        update_task(
+                            existing_task,
+                            name=result.name,
+                            email=e.sender,
+                            summary=result.summary,
+                            description=combined_description,
+                            category=result.category,
+                            status=status,
+                        )
+                    elif at_ai_email_limit:
+                        status = "new"
+                        update_task(
+                            existing_task,
+                            name=result.name,
+                            email=e.sender,
+                            summary=result.summary,
+                            description=combined_description,
+                            category=result.category,
+                            status=status,
+                        )
+                    else:
+                        status = "delayed"
+                        update_task(
+                            existing_task,
+                            name=result.name,
+                            email=e.sender,
+                            summary=result.summary,
+                            description=combined_description,
+                            category=result.category,
+                            status=status,
+                        )
+                        body = ai.generate_email_reply(
+                            content, result.category, actions
+                        )
+                        send_email(
+                            e.sender,
+                            f"{e.subject}",
+                            existing_task,
+                            body,
+                            e.message_id,
+                        )
+                    print(f"Task updated: {result.name}")
+                else:
+                    if actions:
+                        task_id = create_task(
+                            name=result.name,
+                            email=e.sender,
+                            summary=result.summary,
+                            description=content,
+                            due_date=None,
+                            category=result.category,
+                            status="delayed",
+                        )
+                        body = ai.generate_email_reply(
+                            content, result.category, actions
+                        )
+                        send_email(
+                            e.sender,
+                            f"Re: {e.subject}",
+                            task_id,
+                            body,
+                            e.message_id,
+                        )
+                    else:
+                        create_task(
+                            name=result.name,
+                            email=e.sender,
+                            summary=result.summary,
+                            description=content,
+                            due_date=None,
+                            category=result.category,
+                        )
+                    print(f"Task created: {result.name}")
+
         except Exception as ex:
             print(f"Failed to process email uid={e.uid}: {ex}")
 
