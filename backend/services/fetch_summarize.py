@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from services.email_service import fetch_emails, send_email
 from services.llm import LLM
 from services.createTask import create_task
+from database import connection
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
 STATE_FILE = os.path.join(DATA_DIR, "last_email.json")
@@ -31,10 +32,22 @@ def process_batch(batch: list, ai: LLM, dry_run: bool = False):
         if e.sender != "Jack Koskie <jack@koskie.ca>":
             continue
         content = f"From: {e.sender}\nSubject: {e.subject}\nDate: {e.date}\n\n{e.body}"
+        sql, cursor = connection()
+        try:
+            cursor.execute("SELECT cname FROM task_categories")
+            categories = list(cursor.fetchall())
+        except Exception as exc:
+            print(f"Failed to fetch categories: {exc}")
+            categories = []
+        finally:
+            if sql.is_connected():
+                sql.close()
+                cursor.close()
+
         try:
             result = ai.handle_new_email(
                 content,
-                valid_categories=["general"],
+                valid_categories=categories,
                 valid_actions={"insufficient-information": "Request more"},
             )
             if dry_run:
