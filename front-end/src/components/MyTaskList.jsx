@@ -132,7 +132,28 @@ function MyTaskList({ user, onNavigate, onLogout }) {
           keywords={task.categories}
           id={task.tno}
           assignedTo={getAssignedToLabel(task)}
+          assignedToId={task?.assigned_to ?? null}
           assigneeDirectory={employeeDirectory}
+          onAssignmentUpdated={(taskId, employeeId) => {
+            setAllMyTasks((prev) => {
+              const next = prev
+                .map((row) => (String(row.tno) === String(taskId) ? { ...row, assigned_to: employeeId } : row))
+                .filter((row) => String(row.assigned_to) === String(user?.id));
+              return next;
+            });
+
+            setTasks((prev) => {
+              const next = prev
+                .map((row) => (String(row.tno) === String(taskId) ? { ...row, assigned_to: employeeId } : row))
+                .filter((row) => String(row.assigned_to) === String(user?.id));
+
+              setIds(next.map((row) => (
+                <option key={`my-task-id-${row.tno}`} value={String(row.tno)}>{row.tno}</option>
+              )));
+
+              return next;
+            });
+          }}
           onInspect={(taskId) => onNavigate && onNavigate('task-detail', { taskId })}
         />
       ))}

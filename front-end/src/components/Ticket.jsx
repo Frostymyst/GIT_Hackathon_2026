@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import React from 'react';
+import { assignTask } from '../api/taskApi';
 import './Ticket.css';
 
 function getTierLevel(employee) {
@@ -29,79 +30,124 @@ function Ticket(props) {
         }
     };
 
-    const [msg, setMsg] = useState('');
     const [isAssignMenuOpen, setIsAssignMenuOpen] = useState(false);
     const [assignedTo, setAssignedTo] = useState(props.assignedTo || 'Unassigned');
-    const [selectedAssignee, setSelectedAssignee] = useState(props.assignedTo || '');
+    const [selectedAssigneeId, setSelectedAssigneeId] = useState('');
+    const [isAssigning, setIsAssigning] = useState(false);
 
     useEffect(() => {
         const nextAssigned = props.assignedTo || 'Unassigned';
         setAssignedTo(nextAssigned);
-        setSelectedAssignee(props.assignedTo || '');
-    }, [props.assignedTo]);
+        setSelectedAssigneeId(props.assignedToId ? String(props.assignedToId) : '');
+    }, [props.assignedTo, props.assignedToId]);
 
     const assigneeOptions = useMemo(() => {
         const myTier = getTierLevel(props.user);
-        const selfName = props.user?.name;
+        const selfId = props.user?.id;
+        const selfName = props.user?.name || 'Me';
+
+        const normalizeOption = (employee) => {
+            const id = employee?.eno ?? employee?.id;
+            const name = employee?.ename || employee?.name;
+            if (id === undefined || id === null || !name) {
+                return null;
+            }
+            return {
+                id: String(id),
+                name,
+                tier: getTierLevel(employee),
+            };
+        };
 
         if (myTier <= 1) {
-            return selfName ? [selfName] : [];
+            return selfId ? [{ id: String(selfId), name: selfName, tier: 1 }] : [];
         }
 
         const directory = Array.isArray(props.assigneeDirectory) ? props.assigneeDirectory : [];
-        let allowed;
+        const normalizedDirectory = directory.map(normalizeOption).filter(Boolean);
+        let allowed = [];
 
         if (myTier >= 3) {
-            allowed = directory;
+            allowed = normalizedDirectory;
         } else {
-            allowed = directory.filter((employee) => getTierLevel(employee) === 1);
+            allowed = normalizedDirectory.filter((employee) => employee.tier === 1);
         }
 
-        const names = allowed
-            .map((employee) => employee?.ename || employee?.name)
-            .filter(Boolean);
-
-        if (myTier === 2 && selfName) {
-            return names.filter((name) => name !== selfName)
-                .filter((value, index, arr) => arr.indexOf(value) === index);
+        if (myTier === 2 && selfId) {
+            allowed = allowed.filter((employee) => employee.id !== String(selfId));
         }
 
-        const fallback = [selfName, ...(props.user?.employees || [])]
-            .filter(Boolean)
-            .filter((value, index, arr) => arr.indexOf(value) === index);
+        const fallback = selfId
+            ? [{ id: String(selfId), name: selfName, tier: myTier }]
+            : [];
 
-        const uniqueNames = names.filter((value, index, arr) => arr.indexOf(value) === index);
-        return uniqueNames.length ? uniqueNames : fallback;
+        const unique = allowed.filter((employee, index, arr) =>
+            arr.findIndex((candidate) => candidate.id === employee.id) === index
+        );
+
+        return unique.length ? unique : fallback;
     }, [props.assigneeDirectory, props.user]);
 
-    const handleAssign = (event) => {
+    const handleAssign = async (event) => {
         event.preventDefault();
-        if (!selectedAssignee) {
-            setMsg('Please choose a team member first.');
+        if (!selectedAssigneeId) {
             return;
         }
 
-        setAssignedTo(selectedAssignee);
-        setMsg(`${props.id} assigned to ${selectedAssignee}`);
-        setIsAssignMenuOpen(false);
+        setIsAssigning(true);
+        try {
+            await assignTask(props.id, Number(selectedAssigneeId));
+            const selectedOption = assigneeOptions.find((option) => option.id === selectedAssigneeId);
+            const selectedName = selectedOption?.name || `Employee #${selectedAssigneeId}`;
+            setAssignedTo(selectedName);
+            setIsAssignMenuOpen(false);
+
+            if (props.onAssignmentUpdated) {
+                props.onAssignmentUpdated(props.id, Number(selectedAssigneeId), selectedName);
+            }
+        } catch (error) {
+            console.error(error.message || 'Unable to assign task.');
+        } finally {
+            setIsAssigning(false);
+        }
     };
 
-    const handleSelfAssign = (event) => {
+    const handleSelfAssign = async (event) => {
         const selfName = props.user.name;
-        setAssignedTo(selfName);
-        setSelectedAssignee(selfName);
-        setMsg(event.target.id + ' assigned to ' + selfName);
+        const selfId = props.user.id;
+
+        setIsAssigning(true);
+        try {
+            await assignTask(props.id, Number(selfId));
+            setAssignedTo(selfName);
+            setSelectedAssigneeId(String(selfId));
+
+            if (props.onAssignmentUpdated) {
+                props.onAssignmentUpdated(props.id, Number(selfId), selfName);
+            }
+        } catch (error) {
+            console.error(error.message || 'Unable to self-assign task.');
+        } finally {
+            setIsAssigning(false);
+        }
     };
 
-    const handleDrop = () => {
-        setAssignedTo('Unassigned');
-        setSelectedAssignee('');
-        setMsg(`${props.id} unassigned`);
-    };
+    const handleDrop = async () => {
+        setIsAssigning(true);
+        try {
+            await assignTask(props.id, null);
+            setAssignedTo('Unassigned');
+            setSelectedAssigneeId('');
 
-    useEffect(() => {
-        console.log(msg);
-    }, [msg]);
+            if (props.onAssignmentUpdated) {
+                props.onAssignmentUpdated(props.id, null, 'Unassigned');
+            }
+        } catch (error) {
+            console.error(error.message || 'Unable to unassign task.');
+        } finally {
+            setIsAssigning(false);
+        }
+    };
 
     let items;
     if (props.keywords) {
@@ -142,17 +188,18 @@ function Ticket(props) {
                                 <select
                                     className='AssignSelect'
                                     name='assignee'
-                                    value={selectedAssignee}
-                                    onChange={(event) => setSelectedAssignee(event.target.value)}
+                                    value={selectedAssigneeId}
+                                    onChange={(event) => setSelectedAssigneeId(event.target.value)}
+                                    disabled={isAssigning}
                                 >
                                     <option value=''>Select team member</option>
                                     {assigneeOptions.map((assignee) => (
-                                        <option key={assignee} value={assignee}>{assignee}</option>
+                                        <option key={assignee.id} value={assignee.id}>{assignee.name}</option>
                                     ))}
                                 </select>
                                 <div className='AssignMenuBtns'>
-                                    <button type='submit' className='AssignBtn' disabled={!selectedAssignee}>Save</button>
-                                    <button type='button' className='AssignBtn' onClick={() => setIsAssignMenuOpen(false)}>
+                                    <button type='submit' className='AssignBtn' disabled={!selectedAssigneeId || isAssigning}>Save</button>
+                                    <button type='button' className='AssignBtn' onClick={() => setIsAssignMenuOpen(false)} disabled={isAssigning}>
                                         Cancel
                                     </button>
                                 </div>
@@ -160,11 +207,11 @@ function Ticket(props) {
                         )}
                     </>
                 ) : (
-                    <button onClick={handleSelfAssign} className='AssignBtn' id={props.id}>
+                    <button onClick={handleSelfAssign} className='AssignBtn' id={props.id} disabled={isAssigning}>
                         Assign Self
                     </button>
                 )}
-                <button onClick={handleDrop} className='AssignBtn' type='button'>
+                <button onClick={handleDrop} className='AssignBtn' type='button' disabled={isAssigning}>
                     Drop
                 </button>
             </div>

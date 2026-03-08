@@ -123,7 +123,15 @@ function MainList({ user, onNavigate, onLogout }) {
                 keywords={task.categories}
                 id={task.tno}
                 assignedTo={getAssignedToLabel(task)}
+                assignedToId={task?.assigned_to ?? null}
                 assigneeDirectory={employeeDirectory}
+                onAssignmentUpdated={(taskId, employeeId) => {
+                    setTasks((prev) => prev.map((row) =>
+                        String(row.tno) === String(taskId)
+                            ? { ...row, assigned_to: employeeId }
+                            : row
+                    ));
+                }}
                 onInspect={(taskId) => onNavigate && onNavigate('task-detail', { taskId })}
             />
         ))}

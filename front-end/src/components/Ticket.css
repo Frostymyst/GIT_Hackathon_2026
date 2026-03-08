@@ -109,6 +109,12 @@
     transform: translateY(-1px);
 }
 
+.AssignBtn:disabled {
+    opacity: 0.68;
+    cursor: not-allowed;
+    transform: none;
+}
+
 .TaskBtns {
     display: flex;
     flex-direction: row;

@@ -30,4 +30,13 @@ function createTask(payload) {
   });
 }
 
-export { getTasks, getTasksByEmployee, getTaskById, createTask };
+function assignTask(taskId, employeeId = null) {
+  const hasEmployeeId = employeeId !== null && employeeId !== undefined && employeeId !== '';
+  const suffix = hasEmployeeId ? `?employee_id=${encodeURIComponent(employeeId)}` : '';
+
+  return request(`/task/${taskId}/assign${suffix}`, {
+    method: 'PATCH',
+  });
+}
+
+export { getTasks, getTasksByEmployee, getTaskById, createTask, assignTask };
