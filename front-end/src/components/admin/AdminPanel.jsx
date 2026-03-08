@@ -14,7 +14,10 @@ function AdminPanel({ user, onNavigate, onLogout }) {
         <section className="admin-hero">
           <div>
             <p className="admin-eyebrow">Control Center</p>
-            <h1 className="admin-title">Admin Panel</h1>
+            <h1 className="admin-title">
+              <i className="fa-solid fa-sliders" aria-hidden="true" />
+              <span>Admin Panel</span>
+            </h1>
             <p className="admin-subtitle">
               Manage categories, departments, and team performance from one place.
             </p>
