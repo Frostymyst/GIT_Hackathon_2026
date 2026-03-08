@@ -1,11 +1,14 @@
 import { request } from './httpClient';
 
 const AUTH_TOKEN_KEY = 'tasklist_auth_token';
+const AUTH_EMPLOYEE_KEY = 'tasklist_employee';
 
 function loginUser(payload) {
-  return request('/auth/login', {
-    method: 'POST',
-    body: payload,
+  const email = encodeURIComponent(payload?.email ?? '');
+  const password = encodeURIComponent(payload?.password ?? '');
+
+  return request(`/login?email=${email}&password=${password}`, {
+    method: 'PUT',
   });
 }
 
@@ -30,11 +33,38 @@ function clearAuthToken() {
   sessionStorage.removeItem(AUTH_TOKEN_KEY);
 }
 
+function saveAuthenticatedEmployee(employee, rememberMe = true) {
+  const storage = rememberMe ? localStorage : sessionStorage;
+  storage.setItem(AUTH_EMPLOYEE_KEY, JSON.stringify(employee));
+}
+
+function getAuthenticatedEmployee() {
+  const raw = localStorage.getItem(AUTH_EMPLOYEE_KEY) || sessionStorage.getItem(AUTH_EMPLOYEE_KEY);
+  if (!raw) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function clearAuthenticatedEmployee() {
+  localStorage.removeItem(AUTH_EMPLOYEE_KEY);
+  sessionStorage.removeItem(AUTH_EMPLOYEE_KEY);
+}
+
 export {
   AUTH_TOKEN_KEY,
+  AUTH_EMPLOYEE_KEY,
   loginUser,
   signupUser,
   saveAuthToken,
   getAuthToken,
   clearAuthToken,
+  saveAuthenticatedEmployee,
+  getAuthenticatedEmployee,
+  clearAuthenticatedEmployee,
 };

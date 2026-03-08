@@ -44,14 +44,14 @@ def login(email: str, password: str):
     sql, cursor = connection()
     try:
         cursor.execute(
-            "SELECT * FROM employee WHERE email = %s AND password = %s",
+            "SELECT * FROM employees WHERE email = %s AND epassword = %s",
             (email, password),
         )
         employee = cursor.fetchone()
         if employee:
             return {"status": "OK", "employee": employee}
         else:
-            return HTTPException(status_code=401, detail="Invalid email or password")
+            raise HTTPException(status_code=401, detail="Invalid email or password")
     except mysql.connector.Error as err:
         raise HTTPException(status_code=500, detail=str(err)) from err
     finally:
