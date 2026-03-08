@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import TaskInput from './TaskInput';
 import TaskTextarea from './TaskTextarea';
 import TaskSelect from './TaskSelect';
-import TaskFileUpload from './TaskFileUpload';
 import TaskFormFooter from './TaskFormFooter';
 import './TaskForm.css';
 
@@ -39,16 +38,11 @@ function TaskForm() {
     assignedTo: '',
     dueDate: '',
     category: '',
-    attachments: [],
   });
 
   function handleChange(e) {
-    const { id, value, files } = e.target;
-    if (id === 'attachments') {
-      setForm({ ...form, attachments: files });
-    } else {
-      setForm({ ...form, [id]: value });
-    }
+    const { id, value } = e.target;
+    setForm({ ...form, [id]: value });
   }
 
   function handleSubmit(e) {
@@ -75,38 +69,45 @@ function TaskForm() {
         onChange={handleChange}
         required
       />
-      <TaskInput
-        label="Related Contact Email (Optional)"
-        id="contact"
-        type="email"
-        placeholder="Enter email if this task relates to a person"
-        value={form.contact}
-        onChange={handleChange}
-      />
-      <TaskSelect
-        label="Priority"
-        id="priority"
-        options={priorityOptions}
-        value={form.priority}
-        onChange={handleChange}
-        required
-      />
-      <TaskSelect
-        label="Assigned To"
-        id="assignedTo"
-        options={teamMembers}
-        value={form.assignedTo}
-        onChange={handleChange}
-        required
-      />
-      <TaskInput
-        label="Due Date"
-        id="dueDate"
-        type="date"
-        value={form.dueDate}
-        onChange={handleChange}
-        required
-      />
+
+      <div className="task-form-grid">
+        <TaskInput
+          label="Related Contact Email (Optional)"
+          id="contact"
+          type="email"
+          placeholder="Enter email if this task relates to a person"
+          value={form.contact}
+          onChange={handleChange}
+        />
+        <TaskSelect
+          label="Priority"
+          id="priority"
+          options={priorityOptions}
+          value={form.priority}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div className="task-form-grid">
+        <TaskSelect
+          label="Assigned To"
+          id="assignedTo"
+          options={teamMembers}
+          value={form.assignedTo}
+          onChange={handleChange}
+          required
+        />
+        <TaskInput
+          label="Due Date"
+          id="dueDate"
+          type="date"
+          value={form.dueDate}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
       <TaskSelect
         label="Category / Department"
         id="category"
@@ -114,11 +115,6 @@ function TaskForm() {
         value={form.category}
         onChange={handleChange}
         required
-      />
-      <TaskFileUpload
-        label="Attachments (Optional)"
-        id="attachments"
-        onChange={handleChange}
       />
       <TaskFormFooter />
     </form>

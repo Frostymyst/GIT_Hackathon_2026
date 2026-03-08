@@ -50,13 +50,13 @@
     justify-content: space-between;
 }
 
-form {
+.AssignForm {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
 }
-select {
+.AssignSelect {
     padding: 0 2px;
 	background: #fff;
 	border: 2px solid #222;
