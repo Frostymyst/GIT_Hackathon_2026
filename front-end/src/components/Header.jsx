@@ -22,7 +22,9 @@ function Header({ user, onNavigate, onLogout, activeView = 'main' }) {
 
     return (
         <nav className='Navbar'>
-            <div className='NavBrandPlaceholder' aria-hidden='true' />
+            <div className='NavBrand'>
+                <img src='/Catasktophy.png' alt='Catasktrophy' className='NavBrandLogo' />
+            </div>
 
             <div className='NavActions'>
                 <ul>
