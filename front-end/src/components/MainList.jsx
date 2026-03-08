@@ -67,7 +67,7 @@ function MainList({ user, onNavigate, onLogout }) {
             setAllTasks(rows);
             setVisibleTasks(rows);
         };
-        req.open("GET", `${API_BASE_URL}/task`);
+        req.open("GET", `${API_BASE_URL}/task/`);
         req.send();
 
         // Fetch categories
