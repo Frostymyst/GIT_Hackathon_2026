@@ -5,10 +5,6 @@ import './TaskInspectPage.css';
 
 const STATUS_OPTIONS = ['new', 'in-progress', 'delayed', 'completed'];
 
-function handleEmail(event) {
-  
-}
-
 function formatDate(value) {
   if (!value) {
     return 'Not set';
@@ -34,6 +30,19 @@ function TaskInspectPage({ user, taskId, onNavigate, onLogout }) {
   const [selectedTaskStatus, setSelectedTaskStatus] = useState('new');
   const [isSavingTaskStatus, setIsSavingTaskStatus] = useState(false);
   const [taskStatusMessage, setTaskStatusMessage] = useState('');
+
+  const handleEmail = (event) => {
+    event.preventDefault();
+    let reply = new XMLHttpRequest();
+    const form = event.target;
+    const formData = new FormData(form)
+    reply.open("POST", "http://127.0.0.1:8000/task/"+taskId+"/reply")
+    reply.setRequestHeader("Content-type", "application/json")
+    reply.send(JSON.stringify({
+      "content":formData.get("emailContent")
+    }))
+
+  }
 
   useEffect(() => {
     async function loadTask() {
@@ -282,7 +291,7 @@ function TaskInspectPage({ user, taskId, onNavigate, onLogout }) {
               </div>
               <form className='task-inspect-item task-inspect-item-wide' onSubmit={handleEmail}>
                 <span className="task-inspect-label">Reply to Customer</span>
-                <textarea className='task-email-area' placeholder='Dear Mr/Ms/Mrs/Mx...'>
+                <textarea name="emailContent" className='task-email-area' placeholder='Dear Mr/Ms/Mrs/Mx...' required>
                 </textarea>
                 <button type='submit' className='EmailSend'>Send</button>
               </form>
