@@ -36,5 +36,15 @@ services:
             tasklist-mysql:
                 condition: service_healthy
 
+    frontend:
+        build:
+            context: ../front-end
+            args:
+                VITE_API_BASE_URL: https://api.catasktrophy.talonl.ca
+        container_name: hackathon-frontend
+        restart: always
+        ports:
+            - "80:80"
+
 volumes:
     mysql-db:

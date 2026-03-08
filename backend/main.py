@@ -9,10 +9,10 @@ from routers import emails as email_router
 
 app = FastAPI()
 
-# Allow frontend dev servers to call backend APIs from the browser.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        "https://catasktrophy.talonl.ca",
         "http://localhost:5173",
         "http://127.0.0.1:5173",
     ],
@@ -25,16 +25,6 @@ app.include_router(employee.router)
 app.include_router(task.router)
 app.include_router(admin.router)
 app.include_router(email_router.router)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://localhost:5173/"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 @app.get("/")
 def root():

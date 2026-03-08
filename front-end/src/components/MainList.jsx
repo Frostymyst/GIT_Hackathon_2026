@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Header from './Header'
 import './MainList.css'
 import Ticket from './Ticket';
+import { API_BASE_URL } from '../api/httpClient';
 
 
 function MainList({ user, onNavigate, onLogout }) {
@@ -66,7 +67,7 @@ function MainList({ user, onNavigate, onLogout }) {
             setAllTasks(rows);
             setVisibleTasks(rows);
         };
-        req.open("GET", "http://127.0.0.1:8000/task");
+        req.open("GET", `${API_BASE_URL}/task`);
         req.send();
 
         // Fetch categories
@@ -75,7 +76,7 @@ function MainList({ user, onNavigate, onLogout }) {
             const cateResp = JSON.parse(cate.responseText).categories;
             setCategories(Array.isArray(cateResp) ? cateResp : []);
         };
-        cate.open("GET", "http://127.0.0.1:8000/admin/categories");
+        cate.open("GET", `${API_BASE_URL}/admin/categories`);
         cate.send();
 
         // Fetch employee directory for assignment rules
@@ -84,7 +85,7 @@ function MainList({ user, onNavigate, onLogout }) {
             const employeesResp = JSON.parse(employeesReq.responseText).employees;
             setEmployeeDirectory(Array.isArray(employeesResp) ? employeesResp : []);
         };
-        employeesReq.open("GET", "http://127.0.0.1:8000/employee/search?query=");
+        employeesReq.open("GET", `${API_BASE_URL}/employee/search?query=`);
         employeesReq.send();
     }, []);
 

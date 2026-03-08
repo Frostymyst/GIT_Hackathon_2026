@@ -43,8 +43,8 @@ function Ticket(props) {
 
     const assigneeOptions = useMemo(() => {
         const myTier = getTierLevel(props.user);
-        const selfId = props.user?.id;
-        const selfName = props.user?.name || 'Me';
+        const selfId = props.user?.eno ?? props.user?.id;
+        const selfName = props.user?.ename || props.user?.name || 'Me';
 
         const normalizeOption = (employee) => {
             const id = employee?.eno ?? employee?.id;
@@ -113,8 +113,8 @@ function Ticket(props) {
     };
 
     const handleSelfAssign = async (event) => {
-        const selfName = props.user.name;
-        const selfId = props.user.id;
+        const selfName = props.user.ename || props.user.name;
+        const selfId = props.user.eno ?? props.user.id;
 
         setIsAssigning(true);
         try {
@@ -180,7 +180,7 @@ function Ticket(props) {
                 </ul>
             </div>
             <div className='TaskBtns'>
-                {props.user.auth > 1 ? (
+                {getTierLevel(props.user) > 1 ? (
                     <>
                         <button type='button' onClick={() => setIsAssignMenuOpen((open) => !open)} className='AssignBtn'>
                             Assign To

@@ -80,14 +80,8 @@ def create_task(
 ) -> int:
     """Open a MySQL connection, insert a task, and close cleanly."""
     sql, cursor = connection()
+    cursor.close()
     try:
-        connection = mysql.connector.connect(
-            host=os.getenv("MYSQL_HOST", "127.0.0.1"),
-            port=int(os.getenv("MYSQL_PORT", "3306")),
-            user=os.getenv("MYSQL_USER", "tasklist"),
-            password=os.getenv("MYSQL_PASSWORD", "password"),
-            database=os.getenv("MYSQL_DB", "tasklist"),
-        )
         return insert_task(
             name=name,
             connection=sql,
@@ -102,7 +96,6 @@ def create_task(
     except Error as exc:
         raise RuntimeError(f"Failed to insert task: {exc}") from exc
     finally:
-        cursor.close()
         if sql.is_connected():
             sql.close()
 

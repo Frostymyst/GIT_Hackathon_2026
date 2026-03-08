@@ -1,4 +1,5 @@
 import imaplib
+import re
 from datetime import datetime
 import smtplib
 import email
@@ -26,7 +27,7 @@ def fetch_emails(n: int, offset: int = 0):
     print("\n=== Fetching Emails (IMAP) ===")
     with imaplib.IMAP4_SSL(IMAP_SERVER) as mail:
         mail.login(EMAIL, SMTP_PASSWORD)
-        mail.select("INBOX")  # Select Mailbox
+        mail.select("Hackathon")  # Select Mailbox
         _, data = mail.search(None, "ALL")
         ids = data[0].split()
         end = len(ids) - offset
@@ -49,12 +50,15 @@ def fetch_emails(n: int, offset: int = 0):
                 payload = msg.get_payload(decode=True)
                 if isinstance(payload, bytes):
                     body = payload.decode(errors="replace")
+            raw_msg_id = msg["Message-ID"] or ""
+            raw_refs = msg["References"] or None
             email_list.append(
                 emailMsg(
                     uid=uid,
                     sender=msg["From"],
                     subject=msg["Subject"],
-                    message_id=msg["Message-ID"],
+                    message_id=" ".join(raw_msg_id.split()),
+                    references=" ".join(raw_refs.split()) if raw_refs else None,
                     date=msg["Date"],
                     body=body,
                 )
@@ -63,17 +67,26 @@ def fetch_emails(n: int, offset: int = 0):
 
 
 # SMTP - Send a test email
-def send_email(to: str, subject: str, id: int, body: str, reply_to: str | None = None):
+def send_email(to: str, subject: str, id: int, body: str, reply_to: str | None = None, references: str | None = None):
     print("\n=== Sending Test Email (SMTP) ===")
-    msg = MIMEMultipart()
+    msg = MIMEMultipart("alternative")
     msg["From"] = EMAIL
     msg["To"] = to
-    msg["Subject"] = f"{subject} (ID: {id})"
+    clean_subject = re.sub(r"\s*\(ID:\s*\d+\)", "", subject).strip()
+    clean_subject = re.sub(r"^(Re:\s*)+", "", clean_subject, flags=re.IGNORECASE).strip()
+    msg["Subject"] = f"Re: {clean_subject} (ID: {id})"
+    html_body = "".join(
+        f"<p>{line}</p>" if line.strip() else "<br>"
+        for line in body.splitlines()
+    )
+    html = f"<html><body>{html_body}</body></html>"
     msg.attach(MIMEText(body, "plain"))
+    msg.attach(MIMEText(html, "html"))
 
     if reply_to:
         msg["In-Reply-To"] = reply_to
-        msg["References"] = reply_to
+        ref_chain = (references or "").strip()
+        msg["References"] = f"{ref_chain} {reply_to}".strip()
 
     with smtplib.SMTP_SSL(SMTP_SERVER, 465) as server:
         server.login(EMAIL, SMTP_PASSWORD)

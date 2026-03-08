@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Header from '../Header';
 import { getTaskById, getTaskCategories, updateTaskCategory, updateTaskStatus } from '../../api/taskApi';
 import './TaskInspectPage.css';
+import { API_BASE_URL } from '../../api/httpClient';
 
 const STATUS_OPTIONS = ['new', 'in-progress', 'delayed', 'completed'];
 
@@ -36,7 +37,7 @@ function TaskInspectPage({ user, taskId, onNavigate, onLogout }) {
     let reply = new XMLHttpRequest();
     const form = event.target;
     const formData = new FormData(form)
-    reply.open("POST", "http://127.0.0.1:8000/task/"+taskId+"/reply")
+    reply.open("POST", `${API_BASE_URL}/task/${taskId}/reply`)
     reply.setRequestHeader("Content-type", "application/json")
     reply.send(JSON.stringify({
       "content":formData.get("emailContent")
