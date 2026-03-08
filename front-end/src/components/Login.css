@@ -42,8 +42,7 @@
 }
 
 .login-form h2.login-title,
-.login-form p.login-subtitle,
-.login-form p.signup-link {
+.login-form p.login-subtitle {
 	text-align: left !important;
 	margin-left: 0;
 	margin-right: 0;
@@ -175,7 +174,7 @@
 
 .signup-link {
 	margin-top: 12px;
-	text-align: left;
+	text-align: center;
 	color: #4d617a;
 	font-size: 0.92rem;
 }

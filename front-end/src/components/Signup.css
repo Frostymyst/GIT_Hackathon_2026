@@ -23,6 +23,19 @@
 	flex-direction: column;
 	gap: 9px;
 	box-sizing: border-box;
+	text-align: left;
+}
+
+.signup-form > h2,
+.signup-form > p {
+	text-align: left;
+}
+
+.signup-form h2.signup-title,
+.signup-form p.signup-subtitle {
+	text-align: left !important;
+	margin-left: 0;
+	margin-right: 0;
 }
 
 .signup-title {
@@ -30,12 +43,14 @@
 	font-size: 1.92rem;
 	color: #132235;
 	letter-spacing: -0.02em;
+	text-align: left;
 }
 
 .signup-subtitle {
 	margin: 4px 0 14px;
 	color: #5d6e82;
 	font-size: 0.95rem;
+	text-align: left;
 }
 
 .signup-label {
