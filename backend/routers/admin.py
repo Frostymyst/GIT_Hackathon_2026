@@ -219,6 +219,32 @@ async def add_employee(payload: EmployeeRequest):
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 
+@router.get("/leaderboard")
+async def get_employee_leaderboard(limit: int = 20):
+    """List employees by completed tasks count, descending."""
+    sql, cursor = connection()
+    try:
+        safe_limit = limit if limit > 0 else 20
+        cursor.execute(
+            "SELECT e.eno AS employee_id, e.ename AS employee_name, "
+            "COUNT(t.tno) AS completed_tasks "
+            "FROM employees e "
+            "LEFT JOIN task t ON t.assigned_to = e.eno AND t.status = 'completed' "
+            "GROUP BY e.eno, e.ename "
+            "ORDER BY completed_tasks DESC, employee_name ASC "
+            "LIMIT %s",
+            (safe_limit,),
+        )
+        leaderboard = cursor.fetchall()
+        return {"status": "OK", "leaderboard": leaderboard}
+    except mysql.connector.Error as err:
+        raise HTTPException(status_code=500, detail=str(err)) from err
+    finally:
+        if sql.is_connected():
+            cursor.close()
+            sql.close()
+
+
 @router.get("/{employee_id}")
 async def get_employee(employee_id: int):
     """Get employee by ID"""
