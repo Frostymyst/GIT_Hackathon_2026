@@ -1,16 +1,62 @@
 from fastapi import FastAPI, HTTPException
-from services.llm import LLM
+from fastapi.middleware.cors import CORSMiddleware
+import mysql.connector
+import os
 
-from routers import employee, task
+from database import connection
+from routers import admin, employee, task
 from routers import emails as email_router
 
 app = FastAPI()
+
+# Allow frontend dev servers to call backend APIs from the browser.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(employee.router)
 app.include_router(task.router)
+app.include_router(admin.router)
 app.include_router(email_router.router)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:5173/"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def root():
     return {"status": "OK"}
 
 
+@app.put("/login")
+def login(email: str, password: str):
+    sql, cursor = connection()
+    try:
+        cursor.execute(
+            "SELECT * FROM employee WHERE email = %s AND password = %s",
+            (email, password),
+        )
+        employee = cursor.fetchone()
+        if employee:
+            return {"status": "OK", "employee": employee}
+        else:
+            return HTTPException(status_code=401, detail="Invalid email or password")
+    except mysql.connector.Error as err:
+        raise HTTPException(status_code=500, detail=str(err)) from err
+    finally:
+        if sql.is_connected():
+            cursor.close()
+            sql.close()
