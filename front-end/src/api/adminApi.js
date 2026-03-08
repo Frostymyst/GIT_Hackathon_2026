@@ -7,6 +7,10 @@ function createCategory(cname) {
   });
 }
 
+function getCategories() {
+  return request('/admin/categories');
+}
+
 function deleteCategory(cname) {
   return request(`/admin/categories/${encodeURIComponent(cname)}`, {
     method: 'DELETE',
@@ -61,10 +65,11 @@ function removeCategoryFromDepartment(departmentId, cname) {
 }
 
 function getTaskCategories() {
-  return request('/admin/categories');
+  return getCategories();
 }
 
 export {
+  getCategories,
   createCategory,
   deleteCategory,
   getLeaderboard,

@@ -6,10 +6,10 @@ import DepartmentCategoryAssign from './DepartmentCategoryAssign';
 import DepartmentManager from './DepartmentManager';
 import './AdminPanel.css';
 
-function AdminPanel({ user, onNavigate }) {
+function AdminPanel({ user, onNavigate, onLogout }) {
   return (
     <div className="admin-page">
-      <Header user={user} onNavigate={onNavigate} activeView="admin" />
+      <Header user={user} onNavigate={onNavigate} onLogout={onLogout} activeView="admin" />
       <main className="admin-main">
         <section className="admin-hero">
           <div>

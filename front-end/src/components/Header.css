@@ -49,3 +49,18 @@
 #AdminPanel {
     float: right;
 }
+
+.LogoutBtn {
+    border: 1px solid #333333;
+    background: #ffffff;
+    color: #111827;
+    border-radius: 6px;
+    padding: 0.45rem 0.8rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.LogoutBtn:hover {
+    background: #f3f4f6;
+}
