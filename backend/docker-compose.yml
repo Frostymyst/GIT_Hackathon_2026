@@ -16,7 +16,17 @@ services:
             - mysql-db:/var/lib/mysql
             - ./tasklistSQL/ddl:/docker-entrypoint-initdb.d
         healthcheck:
-            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "tasklist", "-ppassword"]
+            test:
+                [
+                    "CMD",
+                    "mysqladmin",
+                    "ping",
+                    "-h",
+                    "localhost",
+                    "-u",
+                    "tasklist",
+                    "-ppassword",
+                ]
             interval: 5s
             timeout: 5s
             retries: 10

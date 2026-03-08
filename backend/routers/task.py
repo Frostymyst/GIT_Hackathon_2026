@@ -316,7 +316,7 @@ async def delete_task(task_id: int):
 
 
 @router.patch("/{task_id}/status")
-async def update_task(task_id: int, new_status: str | None = None):
+async def update_task_status(task_id: int, new_status: str | None = None):
     """Set a task's status to the next stage in the workflow"""
     STATUSES = ["new", "in-progress", "delayed", "completed"]
 
