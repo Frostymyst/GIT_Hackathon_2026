@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import Header from './Header'
 import './MainList.css'
 import Ticket from './Ticket';
@@ -19,7 +18,14 @@ function MainList({ user, onNavigate, onLogout }) {
     const handleSort = (event) => {
         let cat = event.target.id;
         const catReq = new XMLHttpRequest();
-        catReq.open("GET", "")
+        catReq.open("GET", "http://127.0.0.1:8000/task/category/"+cat)
+        catReq.send()
+
+        catReq.onload = () => {
+            let cats = JSON.parse(req.responseText).tasks;
+            tickets = cats.map((e) => <Ticket user={user} title={e.name} desc={e.summary} keywords={e.categories} id={e.tno}/>)
+            console.log(cats)
+        }
     }
 
     cate.onload = () => {
