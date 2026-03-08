@@ -34,6 +34,8 @@ def fetch_emails(n: int, offset: int = 0):
         latest = ids[start:end]
         for uid in reversed(latest):
             _, msg_data = mail.fetch(uid, "(RFC822)")
+            if not isinstance(msg_data[0], tuple):
+                continue
             msg = email.message_from_bytes(msg_data[0][1])
             body = ""
             if msg.is_multipart():
