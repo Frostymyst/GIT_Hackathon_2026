@@ -11,11 +11,23 @@ function normalizeEmployee(employee) {
     return null;
   }
 
+  let authLevel = Number(employee.auth ?? employee.access_level ?? NaN);
+  if (Number.isNaN(authLevel)) {
+    const title = String(employee.title ?? '').toLowerCase();
+    if (title.includes('tier 3')) {
+      authLevel = 3;
+    } else if (title.includes('tier 2')) {
+      authLevel = 2;
+    } else {
+      authLevel = 1;
+    }
+  }
+
   return {
     ...employee,
     id: employee.id ?? employee.eno ?? 0,
     name: employee.name ?? employee.ename ?? employee.email ?? 'User',
-    auth: Number(employee.auth ?? employee.access_level ?? 1),
+    auth: authLevel,
     employees: Array.isArray(employee.employees) ? employee.employees : [],
   };
 }
