@@ -28,7 +28,7 @@ async def get_tasks(category: str | None = None, cname: str | None = None):
                 cursor.execute("SELECT * FROM task WHERE categories IS NULL")
             else:
                 cursor.execute(
-                    "SELECT * FROM task WHERE LOWER(categories) = (%s)",
+                    "SELECT * FROM task WHERE LOWER(categories) = LOWER(%s)",
                     (normalized_category,),
                 )
         else:
@@ -57,6 +57,10 @@ async def make_new_task(task_data: CreateTaskRequest):
     name = ai_response.name
     summary = ai_response.summary
     category = ai_response.category
+
+    # Tasks are modeled with a single category value.
+    if isinstance(category, str) and "," in category:
+        raise HTTPException(status_code=400, detail="Task category must be a single value")
 
     task_id = create_task(
         name,
