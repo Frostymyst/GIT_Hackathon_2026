@@ -10,7 +10,6 @@ from database import connection
 router = APIRouter(prefix="/task", tags=["task"])
 ai = LLM()
 
-
 class CreateTaskRequest(BaseModel):
     email: str | None = None
     description: str

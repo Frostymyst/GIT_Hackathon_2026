@@ -11,7 +11,7 @@ function MainList(props) {
         tickets = req
     }
 
-    req.open("GET", "/backend/routers/task.py")
+    req.open("GET", "http://localhost:8000/task")
     req.send()
 
     const User = {
