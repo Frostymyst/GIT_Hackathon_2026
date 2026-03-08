@@ -103,6 +103,13 @@
     border-color: #b9dbc9;
 }
 
+#TagList li.TagItem.is-active {
+    background: #e3f4ec;
+    border-color: #3d9970;
+    color: #215941;
+    box-shadow: inset 0 0 0 1px rgba(61, 153, 112, 0.2);
+}
+
 #CreateDiv {
     display: flex;
     justify-content: center;

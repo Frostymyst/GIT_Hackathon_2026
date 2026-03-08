@@ -8,7 +8,8 @@ function MyTaskList({ user, onNavigate, onLogout }) {
   const [tasks, setTasks] = useState([]);
   const [allMyTasks, setAllMyTasks] = useState([]);
   const [ids, setIds] = useState([]);
-  const [tags, setTags] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [employeeDirectory, setEmployeeDirectory] = useState([]);
 
   const getAssignedToLabel = (task) => {
@@ -29,15 +30,28 @@ function MyTaskList({ user, onNavigate, onLogout }) {
     return matched.ename || matched.name || `Employee #${assignedId}`;
   };
 
-  const handleSort = (event) => {
-    const selectedCategory = String(event.target.id || '').toLowerCase();
-    const filtered = allMyTasks.filter((task) =>
-      String(task?.categories || '').toLowerCase() === selectedCategory
-    );
-    setTasks(filtered);
-    setIds(filtered.map((task) => (
+  const setVisibleTasks = (rows) => {
+    setTasks(rows);
+    setIds((rows || []).map((task) => (
       <option key={`my-task-id-${task.tno}`} value={String(task.tno)}>{task.tno}</option>
     )));
+  };
+
+  const handleSort = (categoryName) => {
+    const normalized = String(categoryName || '').trim().toLowerCase();
+
+    if (selectedCategory.toLowerCase() === normalized) {
+      setSelectedCategory('');
+      setVisibleTasks(allMyTasks);
+      return;
+    }
+
+    const filtered = allMyTasks.filter((task) =>
+      String(task?.categories || '').trim().toLowerCase() === normalized
+    );
+
+    setSelectedCategory(categoryName);
+    setVisibleTasks(filtered);
   };
 
   useEffect(() => {
@@ -46,14 +60,10 @@ function MyTaskList({ user, onNavigate, onLogout }) {
         const response = await getTasksByEmployee(user?.id);
         const rows = Array.isArray(response?.tasks) ? response.tasks : [];
         setAllMyTasks(rows);
-        setTasks(rows);
-        setIds(rows.map((task) => (
-          <option key={`my-task-id-${task.tno}`} value={String(task.tno)}>{task.tno}</option>
-        )));
+        setVisibleTasks(rows);
       } catch {
         setAllMyTasks([]);
-        setTasks([]);
-        setIds([]);
+        setVisibleTasks([]);
       }
     }
 
@@ -62,9 +72,7 @@ function MyTaskList({ user, onNavigate, onLogout }) {
     const cate = new XMLHttpRequest();
     cate.onload = () => {
       const cateResp = JSON.parse(cate.responseText).categories;
-      setTags(cateResp.map((category) => (
-        <li id={category.cname} key={category.cname} onClick={handleSort}>{category.cname}</li>
-      )));
+      setCategories(Array.isArray(cateResp) ? cateResp : []);
     };
     cate.open('GET', 'http://127.0.0.1:8000/admin/categories');
     cate.send();
@@ -77,6 +85,19 @@ function MyTaskList({ user, onNavigate, onLogout }) {
     employeesReq.open('GET', 'http://127.0.0.1:8000/employee/search?query=');
     employeesReq.send();
   }, [user?.id]);
+
+  useEffect(() => {
+    if (!selectedCategory) {
+      setVisibleTasks(allMyTasks);
+      return;
+    }
+
+    const normalized = selectedCategory.trim().toLowerCase();
+    const filtered = allMyTasks.filter((task) =>
+      String(task?.categories || '').trim().toLowerCase() === normalized
+    );
+    setVisibleTasks(filtered);
+  }, [allMyTasks, selectedCategory]);
 
   return (
     <>
@@ -107,7 +128,21 @@ function MyTaskList({ user, onNavigate, onLogout }) {
             <td id="TagDiv">
               <div id="Tags">
                 <h4>Filter by Tags/Keywords:</h4>
-                <ul id="TagList">{tags}</ul>
+                <ul id="TagList">
+                  {categories.map((category) => {
+                    const isActive = selectedCategory.toLowerCase() === String(category.cname || '').toLowerCase();
+                    return (
+                      <li
+                        id={category.cname}
+                        key={category.cname}
+                        className={isActive ? 'TagItem is-active' : 'TagItem'}
+                        onClick={() => handleSort(category.cname)}
+                      >
+                        {category.cname}
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
               <div id="CreateDiv">
                 <button id="CreateBtn" type="button" onClick={() => onNavigate && onNavigate('create-task')}>

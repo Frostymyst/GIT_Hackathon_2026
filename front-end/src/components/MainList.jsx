@@ -6,8 +6,10 @@ import Ticket from './Ticket';
 
 function MainList({ user, onNavigate, onLogout }) {
     let [tasks, setTasks] = useState([]); 
+    let [allTasks, setAllTasks] = useState([]);
     let [ids, setIds] = useState([]); 
-    let [tags, setTags] = useState([]);
+    let [categories, setCategories] = useState([]);
+    let [selectedCategory, setSelectedCategory] = useState('');
     let [employeeDirectory, setEmployeeDirectory] = useState([]);
 
     const getAssignedToLabel = (task) => {
@@ -28,18 +30,28 @@ function MainList({ user, onNavigate, onLogout }) {
         return matched.ename || matched.name || `Employee #${assignedId}`;
     };
 
-    const handleSort = (event) => {
-        let cat = "http://127.0.0.1:8000/task?category="+event.target.id+"&cname=";
-        const catReq = new XMLHttpRequest();
-        console.log(cat)
-        catReq.onload = () => {
-            let cats = JSON.parse(catReq.responseText);
-            console.log(cats)
-            setTasks(cats.tasks || []);
+    const setVisibleTasks = (rows) => {
+        setTasks(rows);
+        setIds((rows || []).map((task) => (
+            <option key={`task-id-${task.tno}`} value={String(task.tno)}>{task.tno}</option>
+        )));
+    };
+
+    const handleSort = (categoryName) => {
+        const normalized = String(categoryName || '').trim().toLowerCase();
+
+        if (selectedCategory.toLowerCase() === normalized) {
+            setSelectedCategory('');
+            setVisibleTasks(allTasks);
+            return;
         }
 
-        catReq.open("GET", cat)
-        catReq.send()
+        const filtered = allTasks.filter((task) =>
+            String(task?.categories || '').trim().toLowerCase() === normalized
+        );
+
+        setSelectedCategory(categoryName);
+        setVisibleTasks(filtered);
     }
 
     useEffect(() => {
@@ -47,10 +59,9 @@ function MainList({ user, onNavigate, onLogout }) {
         const req = new XMLHttpRequest();
         req.onload = () => {
             const taskResp = JSON.parse(req.responseText).tasks;
-            setTasks(taskResp || []);
-            setIds(taskResp.map((e) => (
-                <option key={`task-id-${e.tno}`} value={String(e.tno)}>{e.tno}</option>
-            )));
+            const rows = taskResp || [];
+            setAllTasks(rows);
+            setVisibleTasks(rows);
         };
         req.open("GET", "http://127.0.0.1:8000/task");
         req.send();
@@ -59,7 +70,7 @@ function MainList({ user, onNavigate, onLogout }) {
         const cate = new XMLHttpRequest();
         cate.onload = () => {
             const cateResp = JSON.parse(cate.responseText).categories;
-            setTags(cateResp.map((e) => <li id={e.cname} key={e.cname} onClick={handleSort}>{e.cname}</li>));
+            setCategories(Array.isArray(cateResp) ? cateResp : []);
         };
         cate.open("GET", "http://127.0.0.1:8000/admin/categories");
         cate.send();
@@ -73,6 +84,19 @@ function MainList({ user, onNavigate, onLogout }) {
         employeesReq.open("GET", "http://127.0.0.1:8000/employee/search?query=");
         employeesReq.send();
     }, []);
+
+    useEffect(() => {
+        if (!selectedCategory) {
+            setVisibleTasks(allTasks);
+            return;
+        }
+
+        const normalized = selectedCategory.trim().toLowerCase();
+        const filtered = allTasks.filter((task) =>
+            String(task?.categories || '').trim().toLowerCase() === normalized
+        );
+        setVisibleTasks(filtered);
+    }, [allTasks, selectedCategory]);
 
   return (
     <>
@@ -102,7 +126,19 @@ function MainList({ user, onNavigate, onLogout }) {
                             Filter by Tags/Keywords:
                         </h4>
                         <ul id='TagList'>
-                            {tags}
+                            {categories.map((category) => {
+                                const isActive = selectedCategory.toLowerCase() === String(category.cname || '').toLowerCase();
+                                return (
+                                    <li
+                                        id={category.cname}
+                                        key={category.cname}
+                                        className={isActive ? 'TagItem is-active' : 'TagItem'}
+                                        onClick={() => handleSort(category.cname)}
+                                    >
+                                        {category.cname}
+                                    </li>
+                                );
+                            })}
                         </ul>
                     </div>
                     <div id='CreateDiv'>

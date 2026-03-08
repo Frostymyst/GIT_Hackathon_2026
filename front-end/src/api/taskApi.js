@@ -39,4 +39,28 @@ function assignTask(taskId, employeeId = null) {
   });
 }
 
-export { getTasks, getTasksByEmployee, getTaskById, createTask, assignTask };
+async function getTaskCategories() {
+  try {
+    return await request('/task/categories');
+  } catch {
+    // Fallback for environments where dynamic task routes shadow /task/categories.
+    return request('/admin/categories');
+  }
+}
+
+function updateTaskCategory(taskId, category) {
+  return request(`/task/${taskId}/category`, {
+    method: 'PATCH',
+    body: { category },
+  });
+}
+
+export {
+  getTasks,
+  getTasksByEmployee,
+  getTaskById,
+  createTask,
+  assignTask,
+  getTaskCategories,
+  updateTaskCategory,
+};
