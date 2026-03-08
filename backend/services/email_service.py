@@ -68,7 +68,7 @@ def send_email(to: str, subject: str, id: int, body: str, reply_to: str | None =
     msg = MIMEMultipart()
     msg["From"] = EMAIL
     msg["To"] = to
-    msg["Subject"] = f"{subject} (#{id})"
+    msg["Subject"] = f"{subject} (ID: {id})"
     msg.attach(MIMEText(body, "plain"))
 
     if reply_to:
