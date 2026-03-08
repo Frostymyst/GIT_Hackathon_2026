@@ -253,19 +253,19 @@ async def reply_to_task(task_id: int, data: ReplyContent):
                 status_code=400, detail="Task has no customer email to reply to"
             )
 
-        subject = f"Re: {task["name"]}"
+        subject = f'Re: {task["name"]}'
         send_email(customer_email, subject, task_id, content, reply_to=None)
 
         existing_description = task.get("description") or ""
         new_description = existing_description + EMPLOYEE_REPLY_SEP + content
         update_task(
-            tno=task_id,
-            name=task["name"],
-            email=customer_email,
-            summary=task["summary"] or "",
-            description=new_description,
-            category=task.get("categories"),
-            status=task["status"],
+            task_id,
+            task["name"],
+            customer_email,
+            task["summary"] or "",
+            new_description,
+            task.get("categories"),
+            task["status"],
         )
         return {"status": "OK", "message": "Reply sent"}
     except HTTPException:
@@ -316,7 +316,7 @@ async def delete_task(task_id: int):
 
 
 @router.patch("/{task_id}/status")
-async def update_task(task_id: int, new_status: str | None = None):
+async def update_task_status(task_id: int, new_status: str | None = None):
     """Set a task's status to the next stage in the workflow"""
     STATUSES = ["new", "in-progress", "delayed", "completed"]
 
