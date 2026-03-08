@@ -2,7 +2,7 @@ import json
 import os
 from datetime import datetime, timezone
 
-from services.email_service import fetch_emails
+from services.email_service import fetch_emails, send_email
 from services.llm import LLM
 from services.createTask import create_task
 
@@ -30,23 +30,44 @@ def process_batch(batch: list, ai: LLM, dry_run: bool = False):
     for e in batch:
         content = f"From: {e.sender}\nSubject: {e.subject}\nDate: {e.date}\n\n{e.body}"
         try:
-            result = ai.handle_new_email(content, valid_categories=['general'], valid_actions={})
+            result = ai.handle_new_email(
+                content,
+                valid_categories=["general"],
+                valid_actions={"insufficient-information": "Request more"},
+            )
             if dry_run:
                 print(f"[DRY RUN] uid={e.uid.decode()}")
                 print(f"  name:     {result.name}")
                 print(f"  summary:  {result.summary}")
                 print(f"  category: {result.category}")
             else:
-                create_task(
-                    name=result.name,
-                    email=e.sender,
-                    summary=result.summary,
-                    description=content,
-                    due_date=None,
-                    category=result.category,
-                )
+                actions = result.actions
+
+                if actions:
+                    task_id = create_task(
+                        name=result.name,
+                        email=e.sender,
+                        summary=result.summary,
+                        description=content,
+                        due_date=None,
+                        category=result.category,
+                        status="delayed",
+                    )
+
+                    body = ai.generate_email_reply(content, result.category, actions)
+
+                    send_email(e.sender, f"Re: {e.subject}", task_id, body)
+                else:
+                    create_task(
+                        name=result.name,
+                        email=e.sender,
+                        summary=result.summary,
+                        description=content,
+                        due_date=None,
+                        category=result.category,
+                    )
                 print(f"Task created: {result.name}")
-                
+
         except Exception as ex:
             print(f"Failed to process email uid={e.uid}: {ex}")
 
