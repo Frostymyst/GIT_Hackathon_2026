@@ -1,8 +1,7 @@
-import os
 from datetime import date
 from typing import Any
 
-import mysql.connector
+from database import connection
 from mysql.connector import Error
 
 
@@ -74,18 +73,11 @@ def create_task(
     category: str | None = None,
 ) -> int:
     """Open a MySQL connection, insert a task, and close cleanly."""
-    connection = None
+    sql, cursor = connection()
     try:
-        connection = mysql.connector.connect(
-            host=os.getenv("MYSQL_HOST", "127.0.0.1"),
-            port=int(os.getenv("MYSQL_PORT", "3306")),
-            user=os.getenv("MYSQL_USER", "tasklist"),
-            password=os.getenv("MYSQL_PASSWORD", "password"),
-            database=os.getenv("MYSQL_DB", "tasklist"),
-        )
         return insert_task(
             name=name,
-            connection=connection,
+            connection=sql,
             email=email,
             summary=summary,
             description=description,
@@ -97,5 +89,41 @@ def create_task(
     except Error as exc:
         raise RuntimeError(f"Failed to insert task: {exc}") from exc
     finally:
-        if connection is not None and connection.is_connected():
-            connection.close()
+        cursor.close()
+        if sql.is_connected():
+            sql.close()
+
+
+def update_task(
+    tno: int,
+    name: str,
+    email: str | None,
+    summary: str,
+    description: str,
+    category: str | None,
+    status: str,
+) -> None:
+    """Update an existing task by tno with new content and set ordering_access_date to today."""
+    sql, cursor = connection()
+    try:
+        query = (
+            "UPDATE task SET name = %s, summary = %s, description = %s, "
+            "ordering_access_date = CURDATE(), status = %s"
+        )
+        params: list[Any] = [name, summary, description, status]
+        if email is not None:
+            query += ", email = %s"
+            params.append(email)
+        if category is not None:
+            query += ", categories = %s"
+            params.append(category)
+        query += " WHERE tno = %s"
+        params.append(tno)
+        cursor.execute(query, params)
+        sql.commit()
+    except Error as exc:
+        raise RuntimeError(f"Failed to update task: {exc}") from exc
+    finally:
+        cursor.close()
+        if sql.is_connected():
+            sql.close()
