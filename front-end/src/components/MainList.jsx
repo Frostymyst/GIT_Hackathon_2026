@@ -53,10 +53,8 @@ function MainList({ user, onNavigate, onLogout }) {
                         </ul>
                     </div>
                     <div id='CreateDiv'>
-                        <button id='CreateBtn'>
-                            <a href='#'>
-                                Create Issue
-                            </a>
+                        <button id='CreateBtn' type='button' onClick={() => onNavigate && onNavigate('create-task')}>
+                            Create Task
                         </button>
                     </div>
                 </td>
