@@ -34,7 +34,7 @@ def process_batch(batch: list, ai: LLM, dry_run: bool = False):
     for e in batch:
         existing_task = None
         # TODO: Remove this prior to prod
-        if e.sender != "Jack Koskie <jack@koskie.ca>":
+        if e.sender != "Talon Lusk <talonstevelusk@gmail.com>":
             continue
         content = f"From: {e.sender}\nSubject: {e.subject}\nDate: {e.date}\n\n{e.body}"
 
@@ -61,9 +61,9 @@ def process_batch(batch: list, ai: LLM, dry_run: bool = False):
             print(f"Failed to fetch categories: {exc}")
             categories = []
         finally:
+            cursor.close()
             if sql.is_connected():
                 sql.close()
-                cursor.close()
 
         try:
             result = ai.handle_new_email(
@@ -72,6 +72,7 @@ def process_batch(batch: list, ai: LLM, dry_run: bool = False):
                 # TODO: Add more actions here
                 valid_actions={"insufficient-information": "Request more"},
             )
+            print(f"raw actions: {result.actions}")
             if dry_run:
                 task_id = 1
                 body = ai.generate_email_reply(content, result.category, result.actions)
@@ -125,7 +126,7 @@ def process_batch(batch: list, ai: LLM, dry_run: bool = False):
                         )
                         send_email(
                             e.sender,
-                            f"Re: {e.subject}",
+                            f"{e.subject}",
                             existing_task,
                             body,
                             e.message_id,

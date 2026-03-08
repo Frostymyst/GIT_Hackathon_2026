@@ -16,7 +16,7 @@ RUN pip install --no-cache-dir -r requirements.txt \
 
 COPY . .
 
-RUN echo '#!/bin/sh\n. /app/.docker_env\nexec /usr/local/bin/python -u /app/fetch_summarize.py' \
+RUN printf '#!/bin/sh\nset -a\n. /app/.docker_env\nset +a\nexec /usr/local/bin/python -u /app/fetch_summarize.py\n' \
     > /app/run_fetch.sh && chmod +x /app/run_fetch.sh
 
 # Every 1 minute, output piped directly to Docker stdout/stderr
