@@ -7,6 +7,7 @@ class emailMsg(BaseModel):
     subject: str
     date: str
     message_id: str
+    references: str | None
     body: str
 
     def __str__(self):

@@ -34,8 +34,8 @@ def process_batch(batch: list, ai: LLM, dry_run: bool = False):
     for e in batch:
         existing_task = None
         # TODO: Remove this prior to prod
-        if e.sender != "Talon Lusk <talonstevelusk@gmail.com>":
-            continue
+        #if e.sender != "Talon Lusk <talonstevelusk@gmail.com>":
+        #    continue
         content = f"From: {e.sender}\nSubject: {e.subject}\nDate: {e.date}\n\n{e.body}"
 
         if "(ID:" in e.subject:
@@ -76,8 +76,8 @@ def process_batch(batch: list, ai: LLM, dry_run: bool = False):
             if dry_run:
                 task_id = 1
                 body = ai.generate_email_reply(content, result.category, result.actions)
-                print(e.sender, f"Re: {e.subject}", task_id, body)
-                send_email(e.sender, f"Re: {e.subject}", task_id, body, e.message_id)
+                print(e.sender, e.subject, task_id, body)
+                send_email(e.sender, e.subject, task_id, body, e.message_id, e.references)
             else:
                 actions = result.actions
 
@@ -126,10 +126,11 @@ def process_batch(batch: list, ai: LLM, dry_run: bool = False):
                         )
                         send_email(
                             e.sender,
-                            f"{e.subject}",
+                            e.subject,
                             existing_task,
                             body,
                             e.message_id,
+                            e.references,
                         )
                     print(f"Task updated: {result.name}")
                 else:
@@ -148,10 +149,11 @@ def process_batch(batch: list, ai: LLM, dry_run: bool = False):
                         )
                         send_email(
                             e.sender,
-                            f"Re: {e.subject}",
+                            e.subject,
                             task_id,
                             body,
                             e.message_id,
+                            e.references,
                         )
                     else:
                         create_task(
