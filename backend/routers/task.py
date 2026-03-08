@@ -107,6 +107,22 @@ async def get_task_categories_by_id(task_id: int):
             sql.close()
 
 
+@router.get("/category/{cname}")
+async def get_tasks_by_category(cname: str):
+    """Get all tasks that have the given category."""
+    sql, cursor = connection()
+    try:
+        cursor.execute("SELECT * FROM task WHERE categories = %s", (cname,))
+        tasks = cursor.fetchall()
+        return {"status": "OK", "category": cname, "tasks": tasks}
+    except mysql.connector.Error as err:
+        raise HTTPException(status_code=500, detail=str(err)) from err
+    finally:
+        if sql.is_connected():
+            cursor.close()
+            sql.close()
+
+
 @router.delete("/{task_id}")
 async def delete_task(task_id: int):
     """Delete task by ID"""
