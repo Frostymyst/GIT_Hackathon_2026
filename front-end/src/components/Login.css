@@ -4,8 +4,8 @@
 	--auth-ink: #132235;
 	--auth-muted: #5d6e82;
 	--auth-border: #d3deea;
-	--auth-accent: #0b6ef3;
-	--auth-accent-dark: #0a5cc9;
+	--auth-accent: #3d9970;
+	--auth-accent-dark: #3d9970;
 }
 
 .login-container {
@@ -15,7 +15,7 @@
 	justify-content: center;
 	padding: 24px;
 	background:
-		radial-gradient(circle at 8% 10%, #dbeafe 0%, transparent 30%),
+		radial-gradient(circle at 8% 10%, #dcfce7 0%, transparent 30%),
 		radial-gradient(circle at 88% 5%, #c8f1df 0%, transparent 26%),
 		var(--auth-bg);
 	font-family: 'Manrope', 'Avenir Next', 'Segoe UI', sans-serif;
@@ -87,7 +87,7 @@
 .login-input:focus {
 	outline: none;
 	border-color: var(--auth-accent);
-	box-shadow: 0 0 0 4px rgba(11, 110, 243, 0.18);
+	box-shadow: 0 0 0 4px rgba(61, 153, 112, 0.18);
 	background: #ffffff;
 }
 
@@ -134,7 +134,7 @@
 	padding: 12px;
 	border-radius: 11px;
 	border: 1px solid var(--auth-accent);
-	background: linear-gradient(135deg, var(--auth-accent), #1784ff);
+	background: linear-gradient(135deg, var(--auth-accent), var(--auth-accent-dark));
 	color: #ffffff;
 	font-size: 1rem;
 	font-weight: 700;

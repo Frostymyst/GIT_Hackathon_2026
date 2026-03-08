@@ -1,20 +1,16 @@
 .Navbar {
-    list-style-type: none;
-    display: flex;
     position: sticky;
     top: 0;
     z-index: 1000;
 
     width: 100%;
-    height: 100%;
+    min-height: 104px;
+    background: linear-gradient(180deg, #ffffff 0%, #f7fcf8 100%);
+    color: #0f172a;
+    border-bottom: 1px solid #d8e2ef;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
 
-    background-color: whitesmoke;
-    color: black;
-    border-color: #333333;
-    border: 1px solid;
-
-    padding: 1rem;
-    padding-top: 0.7rem;
+    padding: 0.8rem 1.4rem;
     box-sizing: border-box;
 
     display: flex;
@@ -22,45 +18,152 @@
     justify-content: space-between;
 }
 
+.NavBrand {
+    display: inline-flex;
+    align-items: center;
+    min-width: 420px;
+}
+
+.NavBrandLogo {
+    width: auto;
+    height: 88px;
+    display: block;
+    object-fit: contain;
+}
+
+.NavActions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.8rem;
+}
+
 .Navbar ul {
     display: flex;
     list-style: none;
     justify-content: flex-end;
-    gap: 2rem;
+    gap: 0.45rem;
     padding: 0;
     margin: 0;
 }
 
 .Navbar a {
-    text-decoration: none;
-    color: #000;
-    font-weight: 500;
-    font-size: large;
+    color: #1f344f;
 }
 
 .bold a {
-    font-weight: 700;
+    color: #3d9970;
 }
 
-.Navbar ul li{
-   font-size: 1.5rem;
+.Navbar ul li {
+   font-size: 1rem;
 }
 
-#AdminPanel {
-    float: right;
+.nav-link {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 0.8rem;
+    border-radius: 10px;
+    font-size: 0.94rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.nav-link:hover {
+    background: #ecfdf3;
+    color: #3d9970;
+}
+
+.nav-link i {
+    font-size: 0.9rem;
 }
 
 .LogoutBtn {
-    border: 1px solid #333333;
-    background: #ffffff;
-    color: #111827;
-    border-radius: 6px;
-    padding: 0.45rem 0.8rem;
-    font-size: 1rem;
+    border: 1px solid #3d9970;
+    background: linear-gradient(135deg, #3d9970 0%, #3d9970 100%);
+    color: #ffffff;
+    border-radius: 10px;
+    padding: 0.52rem 0.9rem;
+    font-size: 0.93rem;
     font-weight: 600;
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    box-shadow: 0 8px 18px rgba(61, 153, 112, 0.25);
+    transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.2s ease;
 }
 
 .LogoutBtn:hover {
-    background: #f3f4f6;
+    filter: brightness(1.03);
+    transform: translateY(-1px);
+    box-shadow: 0 12px 22px rgba(61, 153, 112, 0.3);
+}
+
+.LogoutBtn:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 900px) {
+    .Navbar {
+        padding: 0.7rem 0.85rem;
+        min-height: 88px;
+    }
+
+    .NavBrand {
+        width: auto;
+        min-width: 280px;
+    }
+
+    .NavBrandLogo {
+        height: 68px;
+    }
+
+    .NavActions {
+        gap: 0.5rem;
+    }
+
+    .Navbar ul {
+        gap: 0.3rem;
+    }
+
+    .nav-link {
+        font-size: 0.86rem;
+        padding: 0.45rem 0.55rem;
+    }
+
+    .LogoutBtn {
+        padding: 0.45rem 0.6rem;
+        font-size: 0.84rem;
+    }
+}
+
+@media (max-width: 700px) {
+    .Navbar {
+        align-items: flex-start;
+        gap: 0.55rem;
+        flex-direction: column;
+    }
+
+    .NavBrand {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .NavBrandLogo {
+        height: 60px;
+    }
+
+    .NavActions {
+        margin-left: 0;
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .Navbar ul {
+        flex-wrap: wrap;
+    }
 }
