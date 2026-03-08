@@ -10,6 +10,14 @@ CREATE TABLE IF NOT EXISTS task_categories (
     cname VARCHAR(50) PRIMARY KEY
 );
 
+CREATE TABLE IF NOT EXISTS dept_categories (
+    dno INT NOT NULL,
+    cname VARCHAR(50) NOT NULL,
+    PRIMARY KEY (dno, cname),
+    FOREIGN KEY (dno) REFERENCES dept(dno),
+    FOREIGN KEY (cname) REFERENCES task_categories(cname)
+);
+
 CREATE TABLE IF NOT EXISTS employees(
     eno INT PRIMARY KEY AUTO_INCREMENT,
     ename VARCHAR(50) NOT NULL,
@@ -52,6 +60,15 @@ CREATE TABLE IF NOT EXISTS workson(
 INSERT INTO dept (dname) VALUES ('Returns'), ('Shipping'), ('Customer Service'), ('Inventory Management');
 
 INSERT INTO task_categories (cname) VALUES ('Shipping'), ('Returns'), ('Damaged'), ('Price Match'), ('Human Intervention');
+
+INSERT INTO dept_categories (dno, cname) VALUES
+(1, 'Returns'),
+(1, 'Damaged'),
+(2, 'Shipping'),
+(3, 'Price Match'),
+(3, 'Human Intervention'),
+(4, 'Shipping'),
+(4, 'Returns');
 
 INSERT INTO employees (ename, email, epassword, phonenumber, bdate, salary, title, hired_date, dno) VALUES 
 ('Alice Smith', 'alice.smith@example.com', 'password123', '123-456-7890', '1985-06-15', 60000.00, 'Tier 1', '2020-01-15', 1), 

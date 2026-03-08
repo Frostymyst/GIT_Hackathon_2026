@@ -3,6 +3,10 @@ import mysql.connector
 from pydantic import BaseModel
 from services.adminSetCategories import create_category, delete_category
 from services.adminSetDepartments import create_department, delete_department
+from services.adminSetDepartmentCategories import (
+    create_department_category,
+    delete_department_category,
+)
 from services.adminSetEmployees import create_employee, delete_employee
 from database import connection
 
@@ -15,6 +19,10 @@ class CategoryRequest(BaseModel):
 
 class DepartmentRequest(BaseModel):
     dname: str
+
+
+class DepartmentCategoryRequest(BaseModel):
+    cname: str
 
 
 class EmployeeRequest(BaseModel):
@@ -107,6 +115,51 @@ async def remove_department(dname: str):
         deleted = delete_department(dname=dname)
         if not deleted:
             raise HTTPException(status_code=404, detail="Department not found")
+        return {"status": "OK", "deleted": True}
+    except RuntimeError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@router.get("/departments/{dno}/categories")
+async def get_department_categories(dno: int):
+    """Get categories assigned to a department."""
+    sql, cursor = connection()
+    try:
+        cursor.execute(
+            "SELECT dc.dno, dc.cname FROM dept_categories dc WHERE dc.dno = %s",
+            (dno,),
+        )
+        mappings = cursor.fetchall()
+        return {"status": "OK", "categories": mappings}
+    except mysql.connector.Error as err:
+        raise HTTPException(status_code=500, detail=str(err)) from err
+    finally:
+        if sql.is_connected():
+            cursor.close()
+            sql.close()
+
+
+@router.post("/departments/{dno}/categories")
+async def add_category_to_department(dno: int, payload: DepartmentCategoryRequest):
+    """Assign a category to a department."""
+    try:
+        created = create_department_category(dno=dno, cname=payload.cname)
+        return {"status": "OK", "created": created}
+    except RuntimeError as exc:
+        if "Duplicate entry" in str(exc):
+            raise HTTPException(
+                status_code=409, detail="Category already assigned to department"
+            ) from exc
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@router.delete("/departments/{dno}/categories/{cname}")
+async def remove_category_from_department(dno: int, cname: str):
+    """Remove a category from a department."""
+    try:
+        deleted = delete_department_category(dno=dno, cname=cname)
+        if not deleted:
+            raise HTTPException(status_code=404, detail="Department-category mapping not found")
         return {"status": "OK", "deleted": True}
     except RuntimeError as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
