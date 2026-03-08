@@ -9,6 +9,7 @@ from services.adminSetDepartmentCategories import (
 )
 from services.adminSetEmployees import create_employee, delete_employee
 from database import connection
+from datetime import date
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -34,6 +35,34 @@ class EmployeeRequest(BaseModel):
     salary: float
     title: str
     dno: int
+
+
+@router.get("/export")
+async def export_admin_data():
+    """Export all admin data (categories, departments, department categories)"""
+    sql, cursor = connection()
+    try:
+        cursor.execute("SELECT * FROM task_categories")
+        categories = cursor.fetchall()
+
+        cursor.execute("SELECT * FROM dept")
+        departments = cursor.fetchall()
+
+        cursor.execute("SELECT * FROM dept_categories")
+        dept_categories = cursor.fetchall()
+
+        return {
+            "exported_at": date.today().isoformat(),
+            "categories": categories,
+            "departments": departments,
+            "dept_categories": dept_categories,
+        }
+    except mysql.connector.Error as err:
+        raise HTTPException(status_code=500, detail=str(err)) from err
+    finally:
+        if sql.is_connected():
+            cursor.close()
+            sql.close()
 
 
 @router.get("/categories")
@@ -159,7 +188,9 @@ async def remove_category_from_department(dno: int, cname: str):
     try:
         deleted = delete_department_category(dno=dno, cname=cname)
         if not deleted:
-            raise HTTPException(status_code=404, detail="Department-category mapping not found")
+            raise HTTPException(
+                status_code=404, detail="Department-category mapping not found"
+            )
         return {"status": "OK", "deleted": True}
     except RuntimeError as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
