@@ -17,15 +17,20 @@ class CreateTaskRequest(BaseModel):
 
 
 @router.get("/")
-async def get_tasks(category: str | None = None):
+async def get_tasks(category: str | None = None, cname: str | None = None):
     """Get all tasks, or get tasks by category"""
     sql, cursor = connection()
     try:
-        if category:
-            if category == "null":
+        requested_category = category if category is not None else cname
+        if requested_category is not None and requested_category.strip() != "":
+            normalized_category = requested_category.strip()
+            if normalized_category.lower() == "null":
                 cursor.execute("SELECT * FROM task WHERE categories IS NULL")
             else:
-                cursor.execute("SELECT * FROM task WHERE categories = %s", (category,))
+                cursor.execute(
+                    "SELECT * FROM task WHERE LOWER(categories) = LOWER(%s)",
+                    (normalized_category,),
+                )
         else:
             cursor.execute("SELECT * FROM task")
         tasks = cursor.fetchall()
@@ -99,6 +104,25 @@ async def get_task_categories_by_id(task_id: int):
         category_value = row.get("categories")
         categories = [category_value] if category_value else []
         return {"status": "OK", "task_id": task_id, "categories": categories}
+    except mysql.connector.Error as err:
+        raise HTTPException(status_code=500, detail=str(err)) from err
+    finally:
+        if sql.is_connected():
+            cursor.close()
+            sql.close()
+
+
+@router.get("/category/{cname}")
+async def get_tasks_by_category(cname: str):
+    """Get all tasks that have the given category."""
+    sql, cursor = connection()
+    try:
+        cursor.execute(
+            "SELECT * FROM task WHERE LOWER(categories) = LOWER(%s)",
+            (cname.strip(),),
+        )
+        tasks = cursor.fetchall()
+        return {"status": "OK", "category": cname.strip(), "tasks": tasks}
     except mysql.connector.Error as err:
         raise HTTPException(status_code=500, detail=str(err)) from err
     finally:
