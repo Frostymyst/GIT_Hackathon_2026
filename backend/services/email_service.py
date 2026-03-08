@@ -26,7 +26,7 @@ def fetch_emails(n: int, offset: int = 0):
     print("\n=== Fetching Emails (IMAP) ===")
     with imaplib.IMAP4_SSL(IMAP_SERVER) as mail:
         mail.login(EMAIL, SMTP_PASSWORD)
-        mail.select("INBOX") # Select Mailbox
+        mail.select("INBOX")  # Select Mailbox
         _, data = mail.search(None, "ALL")
         ids = data[0].split()
         end = len(ids) - offset
@@ -49,22 +49,35 @@ def fetch_emails(n: int, offset: int = 0):
                 payload = msg.get_payload(decode=True)
                 if isinstance(payload, bytes):
                     body = payload.decode(errors="replace")
-            email_list.append(emailMsg(uid=uid, sender=msg['From'], subject=msg['Subject'], date=msg['Date'], body=body))
+            email_list.append(
+                emailMsg(
+                    uid=uid,
+                    sender=msg["From"],
+                    subject=msg["Subject"],
+                    message_id=msg["Message-ID"],
+                    date=msg["Date"],
+                    body=body,
+                )
+            )
     return email_list
 
 
 # SMTP - Send a test email
-def send_email():
+def send_email(to: str, subject: str, id: int, body: str, reply_to: str | None = None):
     print("\n=== Sending Test Email (SMTP) ===")
     msg = MIMEMultipart()
     msg["From"] = EMAIL
-    msg["To"] = EMAIL
-    msg["Subject"] = "Test Email from Hackathon Script"
-    msg.attach(MIMEText("This is a test email sent via smtplib.", "plain"))
+    msg["To"] = to
+    msg["Subject"] = f"{subject} (ID: {id})"
+    msg.attach(MIMEText(body, "plain"))
+
+    if reply_to:
+        msg["In-Reply-To"] = reply_to
+        msg["References"] = reply_to
 
     with smtplib.SMTP_SSL(SMTP_SERVER, 465) as server:
         server.login(EMAIL, SMTP_PASSWORD)
-        server.sendmail(EMAIL, EMAIL, msg.as_string())
+        server.sendmail(EMAIL, to, msg.as_string())
     print("Email sent successfully.")
 
 
@@ -78,35 +91,35 @@ def fetch_calendar():
         password=CALDAV_PASSWORD,
     )
     principal = client.principal()
-    calendars = principal.calendars() # Index Account Calendars
-    calendar = calendars[1] # Select Calender[1] = "Test" Calendar
-    print(f"\nCalendar: {calendar.name}") # Print - Calendar Name
-    events = calendar.events() # Load Calendar Events
-    for event in events[:5]: 
+    calendars = principal.calendars()  # Index Account Calendars
+    calendar = calendars[1]  # Select Calender[1] = "Test" Calendar
+    print(f"\nCalendar: {calendar.name}")  # Print - Calendar Name
+    events = calendar.events()  # Load Calendar Events
+    for event in events[:5]:
         ical = event.icalendar_instance
         for component in ical.walk():
             if component.name == "VEVENT":
-                summary = component.get("SUMMARY", "No title") # Event - Title
-                dtstart = component.get("DTSTART") # Event - Start Date
-                dtend = component.get("DTEND") # Event - End Date
-                print(f"  - {summary} @ {dtstart.dt if dtstart else 'No date'} to {dtend.dt if dtend else 'No date'}")
+                summary = component.get("SUMMARY", "No title")  # Event - Title
+                dtstart = component.get("DTSTART")  # Event - Start Date
+                dtend = component.get("DTEND")  # Event - End Date
+                print(
+                    f"  - {summary} @ {dtstart.dt if dtstart else 'No date'} to {dtend.dt if dtend else 'No date'}"
+                )
+
 
 # CalDAV - Make an Event
-def create_event(title:str, start:datetime, end:datetime):
-    '''
+def create_event(title: str, start: datetime, end: datetime):
+    """
     title - Event Title
     Start Date - Year, Month, Day, Hour, Minute
-    End Date - Year, Month, Day, Hour, Minute  
-    '''
+    End Date - Year, Month, Day, Hour, Minute
+    """
     print("\n=== Creating Calendar Event (CalDAV) ===")
     client = caldav.DAVClient(url=CALDAV_URL, username=EMAIL, password=CALDAV_PASSWORD)
     cal = client.principal().calendars()[1]
     cal.save_event(
-        summary=title, # Event Title
-        dtstart= start, # Start Date - Year, Month, Day, Hour, Minute 
-        dtend=end, # End Date - Year, Month, Day, Hour, Minute 
+        summary=title,  # Event Title
+        dtstart=start,  # Start Date - Year, Month, Day, Hour, Minute
+        dtend=end,  # End Date - Year, Month, Day, Hour, Minute
     )
     print("Event created.")
-
-
-

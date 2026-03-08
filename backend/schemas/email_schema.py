@@ -6,6 +6,7 @@ class emailMsg(BaseModel):
     sender: str
     subject: str
     date: str
+    message_id: str
     body: str
 
     def __str__(self):
