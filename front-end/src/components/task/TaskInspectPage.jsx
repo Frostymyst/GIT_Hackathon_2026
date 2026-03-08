@@ -36,6 +36,7 @@ function TaskInspectPage({ user, taskId, onNavigate, onLogout }) {
   const [selectedTaskStatus, setSelectedTaskStatus] = useState("new");
   const [isSavingTaskStatus, setIsSavingTaskStatus] = useState(false);
   const [taskStatusMessage, setTaskStatusMessage] = useState("");
+  const [taskDueDate, setTaskDueDate] = useState(0);
 
   const handleEmail = (event) => {
     event.preventDefault();
@@ -50,6 +51,17 @@ function TaskInspectPage({ user, taskId, onNavigate, onLogout }) {
       }),
     );
     window.location.reload();
+  };
+
+  const handleTaskDueDateSave = () => {
+    let dueDate = taskDueDate;
+    let reply = new XMLHttpRequest();
+    reply.open(
+      "PATCH",
+      `${API_BASE_URL}/task/${taskId}/due-date?due_date=${dueDate}`,
+    );
+    reply.setRequestHeader("Content-type", "application/json");
+    reply.send();
   };
 
   useEffect(() => {
@@ -68,6 +80,7 @@ function TaskInspectPage({ user, taskId, onNavigate, onLogout }) {
         setStatus(nextTask ? "" : "Task not found.");
         setSelectedCategory(nextTask?.categories || "");
         setSelectedTaskStatus(nextTask?.status || "new");
+        setTaskDueDate(nextTask?.due_date);
       } catch (error) {
         setTask(null);
         setStatus(error.message || "Unable to load task details.");
@@ -324,8 +337,30 @@ function TaskInspectPage({ user, taskId, onNavigate, onLogout }) {
               </div>
               <div className="task-inspect-item">
                 <span className="task-inspect-label">Due Date</span>
-                <span className="task-inspect-value">
-                  {formatDate(task.due_date)}
+                <span
+                  className="task-inspect-value"
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <input
+                    type="date"
+                    name="dueDate"
+                    id="dueDate"
+                    value={taskDueDate}
+                    onChange={(event) => setTaskDueDate(event.target.value)}
+                  />
+                  <button
+                    type="button"
+                    className="task-inspect-category-btn"
+                    onClick={() => {
+                      handleTaskDueDateSave();
+                    }}
+                  >
+                    Save Due Date
+                  </button>
                 </span>
               </div>
               <div className="task-inspect-item task-inspect-item-wide">

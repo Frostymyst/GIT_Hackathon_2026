@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from services.llm import LLM
 from services.createTask import create_task, update_task
 from services.email_service import send_email
-from datetime import date
+from datetime import date, datetime
 import mysql.connector
 from database import connection
 
@@ -270,6 +270,36 @@ async def reply_to_task(task_id: int, data: ReplyContent):
         return {"status": "OK", "message": "Reply sent"}
     except HTTPException:
         raise
+    except mysql.connector.Error as err:
+        raise HTTPException(status_code=500, detail=str(err)) from err
+    finally:
+        if sql.is_connected():
+            cursor.close()
+            sql.close()
+
+
+def _parse_due_date(value: str | int) -> date:
+    """Convert due_date from Unix timestamp or ISO date string to date for MySQL."""
+    if isinstance(value, int) or (isinstance(value, str) and value.strip().isdigit()):
+        return date.fromtimestamp(int(value))
+    s = value.strip() if isinstance(value, str) else str(value)
+    try:
+        return datetime.fromisoformat(s.replace("Z", "+00:00")).date()
+    except ValueError:
+        return datetime.strptime(s, "%Y-%m-%d").date()
+
+
+@router.patch("/{task_id}/due-date")
+async def update_task_due_date(task_id: int, due_date: str | int):
+    """Update a task's due date. Accepts Unix timestamp (seconds) or ISO date string (YYYY-MM-DD)."""
+    sql, cursor = connection()
+    try:
+        parsed = _parse_due_date(due_date)
+        cursor.execute(
+            "UPDATE task SET due_date = %s WHERE tno = %s", (parsed, task_id)
+        )
+        sql.commit()
+        return {"status": "OK", "message": "Due date updated"}
     except mysql.connector.Error as err:
         raise HTTPException(status_code=500, detail=str(err)) from err
     finally:
