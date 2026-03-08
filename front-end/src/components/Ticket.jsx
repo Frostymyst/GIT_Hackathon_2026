@@ -21,7 +21,7 @@ function Ticket(props) {
 
     let items;
     if (props.keywords) {
-        items = props.keywords.map(e => <li key={e}>{e}</li>)
+        items = <li key={props.keywords}>{props.keywords}</li>
     }
     let btns;
     if (props.user.auth > 1) {
@@ -40,7 +40,7 @@ function Ticket(props) {
             </div>
             <div>
                 <h4>
-                    Tags/Keywords:
+                    Category:
                 </h4>
                 <ul className='TaskTags'>
                     {items ? items:"Error"}

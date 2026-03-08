@@ -4,6 +4,7 @@ import Signup from './components/Signup.jsx';
 import MainList from './components/MainList.jsx';
 import AdminPanel from './components/admin/AdminPanel.jsx';
 import TaskPage from './components/task/TaskPage.jsx';
+import CalendarPage from './components/calendar/CalendarPage.jsx';
 import { clearAuthToken, clearAuthenticatedEmployee, getAuthenticatedEmployee } from './api/authApi';
 import './App.css';
 
@@ -84,6 +85,10 @@ function App() {
 
   if (screen === 'create-task') {
     return <TaskPage user={user} onNavigate={handleNavigate} onLogout={handleLogout} />;
+  }
+
+  if (screen === 'calendar') {
+    return <CalendarPage user={user} onNavigate={handleNavigate} onLogout={handleLogout} />;
   }
 
   if (screen === 'signup') {

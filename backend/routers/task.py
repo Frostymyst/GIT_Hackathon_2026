@@ -28,7 +28,7 @@ async def get_tasks(category: str | None = None, cname: str | None = None):
                 cursor.execute("SELECT * FROM task WHERE categories IS NULL")
             else:
                 cursor.execute(
-                    "SELECT * FROM task WHERE LOWER(categories) = LOWER(%s)",
+                    "SELECT * FROM task WHERE LOWER(categories) = (%s)",
                     (normalized_category,),
                 )
         else:

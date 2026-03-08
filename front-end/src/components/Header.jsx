@@ -22,7 +22,9 @@ function Header({ user, onNavigate, onLogout, activeView = 'main' }) {
 
     return (
         <nav className='Navbar'>
-            <div className='NavBrandPlaceholder' aria-hidden='true' />
+            <div className='NavBrand'>
+                <img src='/Catasktrophy.svg' alt='Catasktrophy' className='NavBrandLogo' />
+            </div>
 
             <div className='NavActions'>
                 <ul>
@@ -36,6 +38,12 @@ function Header({ user, onNavigate, onLogout, activeView = 'main' }) {
                         <a href='#' className='nav-link'>
                             <i className='fa-solid fa-clipboard-list' aria-hidden='true' />
                             <span>My Task List</span>
+                        </a>
+                    </li>
+                    <li id='CalendarView' className={activeView === 'calendar' ? 'bold' : ''}>
+                        <a href='#' className='nav-link' onClick={(event) => handleNavigate(event, 'calendar')}>
+                            <i className='fa-solid fa-calendar-days' aria-hidden='true' />
+                            <span>Calendar</span>
                         </a>
                     </li>
                     {admin}

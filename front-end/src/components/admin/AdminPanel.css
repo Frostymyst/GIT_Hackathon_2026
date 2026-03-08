@@ -27,7 +27,7 @@
   letter-spacing: 0.08em;
   font-size: 0.78rem;
   font-weight: 700;
-  color: #1d4ed8;
+  color: #3d9970;
 }
 
 .admin-title {
@@ -39,7 +39,7 @@
 }
 
 .admin-title i {
-  color: #1d4ed8;
+  color: #3d9970;
   font-size: 1.6rem;
 }
 
@@ -72,7 +72,7 @@
 }
 
 .admin-card-title i {
-  color: #2563eb;
+  color: #3d9970;
   font-size: 1rem;
 }
 
@@ -162,8 +162,8 @@
 }
 
 .admin-table th {
-  background: #eff6ff;
-  color: #1e3a8a;
+  background: #ecfdf3;
+  color: #3d9970;
 }
 
 @media (max-width: 900px) {

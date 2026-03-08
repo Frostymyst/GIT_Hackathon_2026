@@ -1,6 +1,6 @@
 .task-form {
   --field-border: #c9d7e8;
-  --field-border-focus: #2563eb;
+  --field-border-focus: #3d9970;
   --field-bg: #f8fbff;
   --field-text: #10243d;
   --field-placeholder: #6b7f98;
@@ -79,7 +79,7 @@
 .task-input:focus {
   outline: none;
   border-color: var(--field-border-focus);
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.16);
+  box-shadow: 0 0 0 4px rgba(61, 153, 112, 0.16);
   background: #ffffff;
   transform: translateY(-1px);
 }
@@ -119,8 +119,8 @@ select.task-input {
   min-height: 54px;
   padding: 0 18px;
   border-radius: 14px;
-  border: 1px solid #0b57d0;
-  background: linear-gradient(135deg, #0b63f6 0%, #0a58ca 100%);
+  border: 1px solid #3d9970;
+  background: linear-gradient(135deg, #3d9970 0%, #3d9970 100%);
   color: #ffffff;
   font-size: 1.06rem;
   letter-spacing: 0.01em;
@@ -130,19 +130,19 @@ select.task-input {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  box-shadow: 0 12px 22px rgba(10, 88, 202, 0.28);
+  box-shadow: 0 12px 22px rgba(61, 153, 112, 0.28);
   transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.2s ease;
 }
 
 .task-submit-btn:hover {
   filter: brightness(1.04);
   transform: translateY(-2px);
-  box-shadow: 0 16px 28px rgba(10, 88, 202, 0.32);
+  box-shadow: 0 16px 28px rgba(61, 153, 112, 0.32);
 }
 
 .task-submit-btn:active {
   transform: translateY(0);
-  box-shadow: 0 8px 18px rgba(10, 88, 202, 0.26);
+  box-shadow: 0 8px 18px rgba(61, 153, 112, 0.26);
 }
 
 @media (max-width: 600px) {
