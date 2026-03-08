@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import TaskInput from './TaskInput';
 import TaskTextarea from './TaskTextarea';
 import TaskSelect from './TaskSelect';
 import TaskFormFooter from './TaskFormFooter';
 import { createTask } from '../../api/taskApi';
+import { getDepartments } from '../../api/adminApi';
 import './TaskForm.css';
 
 const priorityOptions = [
@@ -11,15 +12,6 @@ const priorityOptions = [
   { value: 'medium', label: 'Medium' },
   { value: 'high', label: 'High' },
   { value: 'urgent', label: 'Urgent' },
-];
-
-const categoryOptions = [
-  { value: 'hr', label: 'HR' },
-  { value: 'customer-support', label: 'Customer Support' },
-  { value: 'maintenance', label: 'Maintenance' },
-  { value: 'it', label: 'IT' },
-  { value: 'sales', label: 'Sales' },
-  { value: 'other', label: 'Other' },
 ];
 
 // This would be fetched from backend in real app
@@ -38,11 +30,31 @@ function TaskForm() {
     priority: '',
     assignedTo: '',
     dueDate: '',
-    category: '',
+    department: '',
   });
+  const [departmentOptions, setDepartmentOptions] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
+
+  useEffect(() => {
+    async function loadDepartments() {
+      try {
+        const response = await getDepartments();
+        const rows = Array.isArray(response?.departments) ? response.departments : [];
+        const options = rows.map((dept) => ({
+          value: String(dept.dno ?? dept.id ?? dept.name ?? dept.dname ?? ''),
+          label: dept.dname ?? dept.name ?? `Department ${dept.dno ?? dept.id ?? ''}`,
+        })).filter((option) => option.value && option.label);
+
+        setDepartmentOptions(options);
+      } catch {
+        setDepartmentOptions([]);
+      }
+    }
+
+    loadDepartments();
+  }, []);
 
   function handleChange(e) {
     const { id, value } = e.target;
@@ -73,9 +85,11 @@ function TaskForm() {
     setIsSubmitting(true);
 
     try {
+      const selectedDepartment = departmentOptions.find((option) => option.value === form.department);
+      const departmentLine = selectedDepartment ? `\n\nDepartment: ${selectedDepartment.label}` : '';
       const normalizedDescription = form.title.trim()
-        ? `${form.title.trim()}\n\n${form.description.trim()}`
-        : form.description.trim();
+        ? `${form.title.trim()}\n\n${form.description.trim()}${departmentLine}`
+        : `${form.description.trim()}${departmentLine}`;
 
       const response = await createTask({
         email: form.contact.trim() || null,
@@ -91,7 +105,7 @@ function TaskForm() {
         priority: '',
         assignedTo: '',
         dueDate: '',
-        category: '',
+        department: '',
       });
     } catch (error) {
       setFormError(error.message || 'Unable to create task right now.');
@@ -161,10 +175,10 @@ function TaskForm() {
       </div>
 
       <TaskSelect
-        label="Category / Department"
-        id="category"
-        options={categoryOptions}
-        value={form.category}
+        label="Department"
+        id="department"
+        options={departmentOptions}
+        value={form.department}
         onChange={handleChange}
         required
       />
