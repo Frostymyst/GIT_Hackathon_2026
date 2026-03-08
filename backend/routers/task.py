@@ -98,6 +98,29 @@ async def make_new_task(task_data: CreateTaskRequest):
     return {"status": "success", "task_id": task_id}
 
 
+@router.get("/email/{eno}")
+async def get_tasks_by_email(eno: int):
+    """Get all tasks for a specific email number (eno)."""
+    sql, cursor = connection()
+    try:
+        cursor.execute(
+            """
+            SELECT DISTINCT task.* FROM task
+            LEFT JOIN workson ON task.tno = workson.tno
+            WHERE workson.eno = %s OR task.assigned_to = %s
+            """,
+            (eno, eno),
+        )
+        tasks = cursor.fetchall()
+        return {"status": "OK", "eno": eno, "tasks": tasks}
+    except mysql.connector.Error as err:
+        raise HTTPException(status_code=500, detail=str(err)) from err
+    finally:
+        if sql.is_connected():
+            cursor.close()
+            sql.close()
+
+
 @router.get("/{task_id}")
 async def get_task(task_id: int):
     """Get task by ID"""
