@@ -1,5 +1,6 @@
 services:
-    tasklist-mysql:
+   
+   tasklist-mysql:
         image: mysql:8.4
         container_name: tasklist-mysql
         restart: always

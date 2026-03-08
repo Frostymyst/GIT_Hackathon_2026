@@ -56,8 +56,11 @@ def process_batch(batch: list, ai: LLM, dry_run: bool = False):
 
                     body = ai.generate_email_reply(content, result.category, actions)
 
-                    send_email(e.sender, f"Re: {e.subject}", task_id, body)
+                    send_email(
+                        e.sender, f"Re: {e.subject}", task_id, body, e.message_id
+                    )
                 else:
+
                     create_task(
                         name=result.name,
                         email=e.sender,

@@ -54,6 +54,7 @@ def fetch_emails(n: int, offset: int = 0):
                     uid=uid,
                     sender=msg["From"],
                     subject=msg["Subject"],
+                    message_id=msg["Message-ID"],
                     date=msg["Date"],
                     body=body,
                 )
@@ -62,13 +63,17 @@ def fetch_emails(n: int, offset: int = 0):
 
 
 # SMTP - Send a test email
-def send_email(to: str, subject: str, id: int, body: str):
+def send_email(to: str, subject: str, id: int, body: str, reply_to: str | None = None):
     print("\n=== Sending Test Email (SMTP) ===")
     msg = MIMEMultipart()
     msg["From"] = EMAIL
     msg["To"] = to
     msg["Subject"] = f"{subject} (#{id})"
     msg.attach(MIMEText(body, "plain"))
+
+    if reply_to:
+        msg["In-Reply-To"] = reply_to
+        msg["References"] = reply_to
 
     with smtplib.SMTP_SSL(SMTP_SERVER, 465) as server:
         server.login(EMAIL, SMTP_PASSWORD)
