@@ -89,6 +89,10 @@ function App() {
     return <AdminPanel user={user} onNavigate={handleNavigate} onLogout={handleLogout} />;
   }
 
+  if (screen === 'my-tasks') {
+    //return the user task list
+  }
+
   if (screen === 'create-task') {
     return <TaskPage user={user} onNavigate={handleNavigate} onLogout={handleLogout} />;
   }
