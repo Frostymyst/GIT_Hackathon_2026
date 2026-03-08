@@ -17,6 +17,10 @@ class CreateTaskRequest(BaseModel):
     due_date: int | None = None
 
 
+class UpdateTaskCategoryRequest(BaseModel):
+    category: str
+
+
 @router.get("/")
 async def get_tasks(category: str | None = None, cname: str | None = None):
     """Get all tasks, or get tasks by category"""
@@ -118,6 +122,22 @@ async def get_tasks_by_email(eno: int):
         )
         tasks = cursor.fetchall()
         return {"status": "OK", "eno": eno, "tasks": tasks}
+    except mysql.connector.Error as err:
+        raise HTTPException(status_code=500, detail=str(err)) from err
+    finally:
+        if sql.is_connected():
+            cursor.close()
+            sql.close()
+
+
+@router.get("/categories")
+async def get_task_categories():
+    """Get all task categories"""
+    sql, cursor = connection()
+    try:
+        cursor.execute("SELECT * FROM task_categories")
+        categories = cursor.fetchall()
+        return {"status": "OK", "categories": categories}
     except mysql.connector.Error as err:
         raise HTTPException(status_code=500, detail=str(err)) from err
     finally:
@@ -290,14 +310,41 @@ async def update_task(task_id: int, new_status: str | None = None):
             sql.close()
 
 
-@router.get("/categories")
-async def get_task_categories():
-    """Get all task categories"""
+@router.patch("/{task_id}/category")
+async def update_task_category(task_id: int, payload: UpdateTaskCategoryRequest):
+    """Update a task's single category value."""
+    next_category = (payload.category or "").strip()
+    if not next_category:
+        raise HTTPException(status_code=400, detail="Category is required")
+
     sql, cursor = connection()
     try:
-        cursor.execute("SELECT * FROM task_categories")
-        categories = cursor.fetchall()
-        return {"status": "OK", "categories": categories}
+        cursor.execute("SELECT tno FROM task WHERE tno = %s", (task_id,))
+        found_task = cursor.fetchone()
+        if not found_task:
+            raise HTTPException(status_code=404, detail="Task not found")
+
+        cursor.execute("SELECT cname FROM task_categories")
+        category_rows = cursor.fetchall()
+        category_map = {
+            row["cname"].lower(): row["cname"]
+            for row in category_rows
+            if row.get("cname")
+        }
+
+        normalized = category_map.get(next_category.lower())
+        if not normalized:
+            raise HTTPException(
+                status_code=400,
+                detail="Task category must be one of the existing categories",
+            )
+
+        cursor.execute(
+            "UPDATE task SET categories = %s WHERE tno = %s",
+            (normalized, task_id),
+        )
+        sql.commit()
+        return {"status": "OK", "task_id": task_id, "category": normalized}
     except mysql.connector.Error as err:
         raise HTTPException(status_code=500, detail=str(err)) from err
     finally:
