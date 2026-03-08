@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import './Login.css';
-import { loginUser, saveAuthToken } from '../api/authApi';
+import { loginUser, saveAuthenticatedEmployee, saveAuthToken } from '../api/authApi';
 
-function Login({ onShowSignup }) {
+function Login({ onShowSignup, onLoginSuccess }) {
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -39,11 +39,26 @@ function Login({ onShowSignup }) {
                 password: formData.password,
             });
 
+            if (response?.detail) {
+                throw new Error(response.detail);
+            }
+
+            if (response?.status !== 'OK' || !response?.employee) {
+                throw new Error('Invalid email or password.');
+            }
+
+            saveAuthenticatedEmployee(response.employee, formData.rememberMe);
+
             if (response?.access_token) {
                 saveAuthToken(response.access_token, formData.rememberMe);
             }
 
-            setSuccessMessage('Login request sent successfully.');
+            const employeeName = response.employee?.ename || response.employee?.name || 'user';
+            setSuccessMessage(`Logged in as ${employeeName}.`);
+
+            if (onLoginSuccess) {
+                onLoginSuccess(response.employee);
+            }
         } catch (error) {
             setErrorMessage(error.message || 'Unable to login right now.');
         } finally {

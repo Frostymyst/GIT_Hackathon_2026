@@ -1,7 +1,7 @@
 import Header from './Header'
 import './MainList.css'
 
-function MainList({ user, onNavigate }) {
+function MainList({ user, onNavigate, onLogout }) {
     // eslint-disable-next-line no-unused-vars
     let tickets;
     const req = new XMLHttpRequest();
@@ -15,7 +15,7 @@ function MainList({ user, onNavigate }) {
 
   return (
     <>
-        <Header user={user} onNavigate={onNavigate} activeView="main" />
+                <Header user={user} onNavigate={onNavigate} onLogout={onLogout} activeView="main" />
     <table id='Layout'>
         <tbody>
             <tr>

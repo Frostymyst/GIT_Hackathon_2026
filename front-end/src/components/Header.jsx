@@ -1,6 +1,6 @@
 import './Header.css';
 
-function Header({ user, onNavigate, activeView = 'main' }) {
+function Header({ user, onNavigate, onLogout, activeView = 'main' }) {
     const handleNavigate = (event, target) => {
         event.preventDefault();
         if (onNavigate) {
@@ -28,6 +28,8 @@ function Header({ user, onNavigate, activeView = 'main' }) {
                 </li>
                 {admin}
             </ul>
+
+            <button type='button' className='LogoutBtn' onClick={onLogout}>Logout</button>
         </nav>
     );
 }
