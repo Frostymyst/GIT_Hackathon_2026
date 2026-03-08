@@ -28,6 +28,8 @@ def save_state(uid: str, time: str):
 
 def process_batch(batch: list, ai: LLM, dry_run: bool = False):
     for e in batch:
+        if e.sender != "Jack Koskie <jack@koskie.ca>":
+            continue
         content = f"From: {e.sender}\nSubject: {e.subject}\nDate: {e.date}\n\n{e.body}"
         try:
             result = ai.handle_new_email(
@@ -36,10 +38,10 @@ def process_batch(batch: list, ai: LLM, dry_run: bool = False):
                 valid_actions={"insufficient-information": "Request more"},
             )
             if dry_run:
-                print(f"[DRY RUN] uid={e.uid.decode()}")
-                print(f"  name:     {result.name}")
-                print(f"  summary:  {result.summary}")
-                print(f"  category: {result.category}")
+                task_id = 1
+                body = ai.generate_email_reply(content, result.category, result.actions)
+                print(e.sender, f"Re: {e.subject}", task_id, body)
+                send_email(e.sender, f"Re: {e.subject}", task_id, body, e.message_id)
             else:
                 actions = result.actions
 
