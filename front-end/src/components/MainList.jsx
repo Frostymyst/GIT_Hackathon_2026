@@ -1,50 +1,53 @@
+import { useEffect, useState } from 'react';
 import Header from './Header'
 import './MainList.css'
 import Ticket from './Ticket';
 
 
 function MainList({ user, onNavigate, onLogout }) {
-    let tickets; let ids; let tags;
-    const req = new XMLHttpRequest();
-    const cate = new XMLHttpRequest();
-    req.onload = () => {
-        let taskResp = JSON.parse(req.responseText).tasks;
-        tickets = taskResp.map((e) => <Ticket user={user} title={e.name} desc={e.summary} keywords={e.categories} id={e.tno}/>);
-        ids = taskResp.map((e) => <>
-        <option>{e.tno}</option><option>{e.name}</option>
-        </>)
-    }
+    let [tickets, setTickets] = useState([]); 
+    let [ids, setIds] = useState([]); 
+    let [tags, setTags] = useState([]);
 
     const handleSort = (event) => {
-        let cat = "http://127.0.0.1:8000/task?category="+event.target.id;
+        let cat = "http://127.0.0.1:8000/task?category="+event.target.id+"&cname=";
         const catReq = new XMLHttpRequest();
         console.log(cat)
         catReq.onload = () => {
-            let cats = JSON.parse(req.responseText);
+            let cats = JSON.parse(catReq.responseText);
             console.log(cats)
-            tickets = cats.tasks.map((e) => <Ticket user={user} title={e.name} desc={e.summary} keywords={e.categories} id={e.tno}/>)
-            console.log(cats)
+            setTickets(cats.tasks.map((e) => <Ticket user={user} title={e.name} desc={e.summary} keywords={e.categories} id={e.tno}/>))
         }
 
         catReq.open("GET", cat)
         catReq.send()
     }
 
-    cate.onload = () => {
-        let cateResp = JSON.parse(cate.responseText).categories;
-        tags = cateResp.map((e) => <li id={e.cname} key={e.cname} onClick={handleSort}>{e.cname}</li>)
-        console.log(tags)
-    }
+    useEffect(() => {
+        // Fetch tasks
+        const req = new XMLHttpRequest();
+        req.onload = () => {
+            const taskResp = JSON.parse(req.responseText).tasks;
+            setTickets(taskResp.map((e) => <Ticket user={user} title={e.name} desc={e.summary} keywords={e.categories} id={e.tno} />));
+            setIds(taskResp.map((e) => (
+                <>
+                    <option>{e.tno}</option>
+                    <option>{e.name}</option>
+                </>
+            )));
+        };
+        req.open("GET", "http://127.0.0.1:8000/task");
+        req.send();
 
-    req.open("GET", "http://127.0.0.1:8000/task", false)
-    req.send()
-    cate.open("GET", "http://127.0.0.1:8000/admin/categories", false)
-    cate.send()
-    /*req.setRequestHeader("Content-Type", "application/json")
-    req.send(JSON.stringify({
-        email:"test@example.com",
-        description:"dsa",
-    }))*/
+        // Fetch categories
+        const cate = new XMLHttpRequest();
+        cate.onload = () => {
+            const cateResp = JSON.parse(cate.responseText).categories;
+            setTags(cateResp.map((e) => <li id={e.cname} key={e.cname} onClick={handleSort}>{e.cname}</li>));
+        };
+        cate.open("GET", "http://127.0.0.1:8000/admin/categories");
+        cate.send();
+    }, []);
 
   return (
     <>
