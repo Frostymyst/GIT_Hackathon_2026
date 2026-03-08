@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import Header from '../Header';
-import { getTaskById, getTaskCategories, updateTaskCategory } from '../../api/taskApi';
+import { getTaskById, getTaskCategories, updateTaskCategory, updateTaskStatus } from '../../api/taskApi';
 import './TaskInspectPage.css';
+
+const STATUS_OPTIONS = ['new', 'in-progress', 'delayed', 'completed'];
 
 function handleEmail(event) {
   
@@ -28,6 +30,10 @@ function TaskInspectPage({ user, taskId, onNavigate, onLogout }) {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [isSavingCategory, setIsSavingCategory] = useState(false);
   const [categoryStatus, setCategoryStatus] = useState('');
+  const [isTaskStatusMenuOpen, setIsTaskStatusMenuOpen] = useState(false);
+  const [selectedTaskStatus, setSelectedTaskStatus] = useState('new');
+  const [isSavingTaskStatus, setIsSavingTaskStatus] = useState(false);
+  const [taskStatusMessage, setTaskStatusMessage] = useState('');
 
   useEffect(() => {
     async function loadTask() {
@@ -44,6 +50,7 @@ function TaskInspectPage({ user, taskId, onNavigate, onLogout }) {
         setTask(nextTask);
         setStatus(nextTask ? '' : 'Task not found.');
         setSelectedCategory(nextTask?.categories || '');
+        setSelectedTaskStatus(nextTask?.status || 'new');
       } catch (error) {
         setTask(null);
         setStatus(error.message || 'Unable to load task details.');
@@ -105,6 +112,34 @@ function TaskInspectPage({ user, taskId, onNavigate, onLogout }) {
     setIsCategoryMenuOpen(false);
   }
 
+  async function handleTaskStatusSave(event) {
+    event.preventDefault();
+    if (!task?.tno || !selectedTaskStatus) {
+      return;
+    }
+
+    setIsSavingTaskStatus(true);
+    setTaskStatusMessage('');
+    try {
+      const response = await updateTaskStatus(task.tno, selectedTaskStatus);
+      const nextStatus = response?.new_status || selectedTaskStatus;
+      setTask((prev) => (prev ? { ...prev, status: nextStatus } : prev));
+      setSelectedTaskStatus(nextStatus);
+      setTaskStatusMessage('Status updated.');
+      setIsTaskStatusMenuOpen(false);
+    } catch (error) {
+      setTaskStatusMessage(error.message || 'Unable to update status.');
+    } finally {
+      setIsSavingTaskStatus(false);
+    }
+  }
+
+  function handleTaskStatusCancel() {
+    setSelectedTaskStatus(task?.status || 'new');
+    setTaskStatusMessage('');
+    setIsTaskStatusMenuOpen(false);
+  }
+
   return (
     <div className="task-inspect-page">
       <Header user={user} onNavigate={onNavigate} onLogout={onLogout} activeView="main" />
@@ -133,7 +168,54 @@ function TaskInspectPage({ user, taskId, onNavigate, onLogout }) {
               </div>
               <div className="task-inspect-item">
                 <span className="task-inspect-label">Status</span>
-                <span className="task-inspect-value">{task.status || 'new'}</span>
+                <div className="task-inspect-category-row">
+                  <span className="task-inspect-value">{task.status || 'new'}</span>
+                  <div className="task-inspect-category-actions">
+                    <button
+                      type="button"
+                      className="task-inspect-category-btn"
+                      onClick={() => {
+                        setTaskStatusMessage('');
+                        setIsTaskStatusMenuOpen((open) => !open);
+                      }}
+                    >
+                      Change
+                    </button>
+                    {isTaskStatusMenuOpen && (
+                      <form className="task-inspect-category-menu" onSubmit={handleTaskStatusSave}>
+                        <select
+                          className="task-inspect-category-select"
+                          value={selectedTaskStatus}
+                          onChange={(event) => setSelectedTaskStatus(event.target.value)}
+                          disabled={isSavingTaskStatus}
+                        >
+                          <option value="">Select status</option>
+                          {STATUS_OPTIONS.map((statusOption) => (
+                            <option key={statusOption} value={statusOption}>{statusOption}</option>
+                          ))}
+                        </select>
+                        <div className="task-inspect-category-menu-actions">
+                          <button
+                            type="submit"
+                            className="task-inspect-category-btn"
+                            disabled={!selectedTaskStatus || isSavingTaskStatus}
+                          >
+                            Save
+                          </button>
+                          <button
+                            type="button"
+                            className="task-inspect-category-btn"
+                            onClick={handleTaskStatusCancel}
+                            disabled={isSavingTaskStatus}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    )}
+                  </div>
+                </div>
+                {taskStatusMessage && <span className="task-inspect-inline-message">{taskStatusMessage}</span>}
               </div>
               <div className="task-inspect-item">
                 <span className="task-inspect-label">Category</span>

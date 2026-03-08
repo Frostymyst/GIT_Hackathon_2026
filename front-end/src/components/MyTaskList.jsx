@@ -12,6 +12,8 @@ function MyTaskList({ user, onNavigate, onLogout }) {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [employeeDirectory, setEmployeeDirectory] = useState([]);
 
+  const isCompletedTask = (task) => String(task?.status || '').trim().toLowerCase() === 'completed';
+
   const getAssignedToLabel = (task) => {
     const assignedId = task?.assigned_to ?? task?.assignedTo ?? task?.eno;
     if (!assignedId) {
@@ -31,8 +33,9 @@ function MyTaskList({ user, onNavigate, onLogout }) {
   };
 
   const setVisibleTasks = (rows) => {
-    setTasks(rows);
-    setIds((rows || []).map((task) => (
+    const visibleRows = (rows || []).filter((task) => !isCompletedTask(task));
+    setTasks(visibleRows);
+    setIds(visibleRows.map((task) => (
       <option key={`my-task-id-${task.tno}`} value={String(task.tno)}>{task.tno}</option>
     )));
   };

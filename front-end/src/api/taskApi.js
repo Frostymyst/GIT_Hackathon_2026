@@ -55,6 +55,13 @@ function updateTaskCategory(taskId, category) {
   });
 }
 
+function updateTaskStatus(taskId, newStatus) {
+  const suffix = newStatus ? `?new_status=${encodeURIComponent(newStatus)}` : '';
+  return request(`/task/${taskId}/status${suffix}`, {
+    method: 'PATCH',
+  });
+}
+
 export {
   getTasks,
   getTasksByEmployee,
@@ -63,4 +70,5 @@ export {
   assignTask,
   getTaskCategories,
   updateTaskCategory,
+  updateTaskStatus,
 };

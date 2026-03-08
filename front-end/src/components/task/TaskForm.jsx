@@ -3,8 +3,8 @@ import TaskInput from './TaskInput';
 import TaskTextarea from './TaskTextarea';
 import TaskSelect from './TaskSelect';
 import TaskFormFooter from './TaskFormFooter';
-import { createTask } from '../../api/taskApi';
-import { getDepartments } from '../../api/adminApi';
+import { assignTask, createTask } from '../../api/taskApi';
+import { getDepartments, searchEmployees } from '../../api/adminApi';
 import './TaskForm.css';
 
 const priorityOptions = [
@@ -12,14 +12,6 @@ const priorityOptions = [
   { value: 'medium', label: 'Medium' },
   { value: 'high', label: 'High' },
   { value: 'urgent', label: 'Urgent' },
-];
-
-// This would be fetched from backend in real app
-const teamMembers = [
-  { value: 'unassigned', label: 'Unassigned' },
-  { value: 'alice', label: 'Alice Smith' },
-  { value: 'bob', label: 'Bob Johnson' },
-  { value: 'carol', label: 'Carol Lee' },
 ];
 
 function TaskForm() {
@@ -33,6 +25,9 @@ function TaskForm() {
     department: '',
   });
   const [departmentOptions, setDepartmentOptions] = useState([]);
+  const [teamMemberOptions, setTeamMemberOptions] = useState([
+    { value: '', label: 'Unassigned' },
+  ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
@@ -54,6 +49,31 @@ function TaskForm() {
     }
 
     loadDepartments();
+  }, []);
+
+  useEffect(() => {
+    async function loadTeamMembers() {
+      try {
+        const response = await searchEmployees('');
+        const rows = Array.isArray(response?.employees) ? response.employees : [];
+        const options = rows
+          .map((employee) => {
+            const id = employee?.eno ?? employee?.id;
+            const name = employee?.ename ?? employee?.name;
+            if (id === undefined || id === null || !name) {
+              return null;
+            }
+            return { value: String(id), label: name };
+          })
+          .filter(Boolean);
+
+        setTeamMemberOptions([{ value: '', label: 'Unassigned' }, ...options]);
+      } catch {
+        setTeamMemberOptions([{ value: '', label: 'Unassigned' }]);
+      }
+    }
+
+    loadTeamMembers();
   }, []);
 
   function handleChange(e) {
@@ -97,7 +117,12 @@ function TaskForm() {
         due_date: dueTimestamp,
       });
 
-      setFormSuccess(`Task created successfully (ID: ${response?.task_id ?? 'new'}).`);
+      const createdTaskId = response?.task_id;
+      if (createdTaskId && form.assignedTo) {
+        await assignTask(createdTaskId, Number(form.assignedTo));
+      }
+
+      setFormSuccess(`Task created successfully (ID: ${createdTaskId ?? 'new'}).`);
       setForm({
         title: '',
         description: '',
@@ -159,10 +184,9 @@ function TaskForm() {
         <TaskSelect
           label="Assigned To"
           id="assignedTo"
-          options={teamMembers}
+          options={teamMemberOptions}
           value={form.assignedTo}
           onChange={handleChange}
-          required
         />
         <TaskInput
           label="Due Date"
