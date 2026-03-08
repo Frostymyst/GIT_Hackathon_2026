@@ -67,7 +67,7 @@ function MainList({ user, onNavigate, onLogout }) {
             setAllTasks(rows);
             setVisibleTasks(rows);
         };
-        req.open("GET", "${API_BASE_URL}/task");
+        req.open("GET", `${API_BASE_URL}/task`);
         req.send();
 
         // Fetch categories
@@ -76,7 +76,7 @@ function MainList({ user, onNavigate, onLogout }) {
             const cateResp = JSON.parse(cate.responseText).categories;
             setCategories(Array.isArray(cateResp) ? cateResp : []);
         };
-        cate.open("GET", "${API_BASE_URL}/admin/categories");
+        cate.open("GET", `${API_BASE_URL}/admin/categories`);
         cate.send();
 
         // Fetch employee directory for assignment rules
@@ -85,7 +85,7 @@ function MainList({ user, onNavigate, onLogout }) {
             const employeesResp = JSON.parse(employeesReq.responseText).employees;
             setEmployeeDirectory(Array.isArray(employeesResp) ? employeesResp : []);
         };
-        employeesReq.open("GET", "${API_BASE_URL}/employee/search?query=");
+        employeesReq.open("GET", `${API_BASE_URL}/employee/search?query=`);
         employeesReq.send();
     }, []);
 

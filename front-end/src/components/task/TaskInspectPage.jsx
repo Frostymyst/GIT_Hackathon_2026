@@ -37,7 +37,7 @@ function TaskInspectPage({ user, taskId, onNavigate, onLogout }) {
     let reply = new XMLHttpRequest();
     const form = event.target;
     const formData = new FormData(form)
-    reply.open("POST", "${API_BASE_URL}/task/"+taskId+"/reply")
+    reply.open("POST", `${API_BASE_URL}/task/${taskId}/reply`)
     reply.setRequestHeader("Content-type", "application/json")
     reply.send(JSON.stringify({
       "content":formData.get("emailContent")
