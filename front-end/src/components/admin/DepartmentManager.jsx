@@ -91,9 +91,9 @@ function DepartmentManager() {
         </button>
       </div>
 
-      <div className="admin-actions-row">
+      {/* <div className="admin-actions-row">
         <button type="button" className="admin-btn" onClick={loadDepartments}>Reload Departments</button>
-      </div>
+      </div> */}
 
       {status && <p className="admin-message">{status}</p>}
 
