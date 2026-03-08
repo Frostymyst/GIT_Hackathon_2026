@@ -4,14 +4,14 @@ services:
         container_name: tasklist-mysql
         restart: always
         environment:
-            MYSQL_DATABASE: 'tasklist'
-            MYSQL_USER: 'tasklist'
-            MYSQL_PASSWORD: 'password'
-            MYSQL_ROOT_PASSWORD: 'password'
+            MYSQL_DATABASE: "tasklist"
+            MYSQL_USER: "tasklist"
+            MYSQL_PASSWORD: "password"
+            MYSQL_ROOT_PASSWORD: "password"
         ports:
-            - '3309:3306'
+            - "3306:3306"
         expose:
-            - '3306'
+            - "3306"
         volumes:
             - mysql-db:/var/lib/mysql
             - ./tasklistSQL/ddl:/docker-entrypoint-initdb.d
@@ -23,9 +23,9 @@ services:
         env_file: .env
         environment:
             MYSQL_HOST: tasklist-mysql
-            MYSQL_PORT: '3306'
+            MYSQL_PORT: "3306"
         ports:
-            - '8000:8000'
+            - "8000:8000"
         depends_on:
             - tasklist-mysql
 
