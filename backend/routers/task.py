@@ -50,17 +50,39 @@ async def make_new_task(task_data: CreateTaskRequest):
     description = task_data.description
     due_date = task_data.due_date
 
+    sql, cursor = connection()
+    try:
+        cursor.execute("SELECT cname FROM task_categories")
+        category_rows = cursor.fetchall()
+        valid_categories = [row["cname"] for row in category_rows if row.get("cname")]
+    except mysql.connector.Error as err:
+        raise HTTPException(status_code=500, detail=str(err)) from err
+    finally:
+        if sql.is_connected():
+            cursor.close()
+            sql.close()
+
     ai_response = ai.handle_new_email(
-        description, valid_categories=[], valid_actions={}
+        description, valid_categories=valid_categories, valid_actions={}
     )
 
     name = ai_response.name
     summary = ai_response.summary
-    category = ai_response.category
+    category = ai_response.category.strip() if isinstance(ai_response.category, str) else None
 
     # Tasks are modeled with a single category value.
     if isinstance(category, str) and "," in category:
         raise HTTPException(status_code=400, detail="Task category must be a single value")
+
+    if category is not None:
+        # Normalize LLM output to an existing category value (case-insensitive).
+        category_map = {c.lower(): c for c in valid_categories}
+        if category.lower() not in category_map:
+            raise HTTPException(
+                status_code=400,
+                detail="Task category must be one of the existing categories",
+            )
+        category = category_map[category.lower()]
 
     task_id = create_task(
         name,
