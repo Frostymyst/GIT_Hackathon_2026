@@ -86,6 +86,27 @@ async def get_task(task_id: int):
             sql.close()
 
 
+@router.get("/{task_id}/categories")
+async def get_task_categories_by_id(task_id: int):
+    """Get all categories for a specific task ID."""
+    sql, cursor = connection()
+    try:
+        cursor.execute("SELECT categories FROM task WHERE tno = %s", (task_id,))
+        row = cursor.fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="Task not found")
+
+        category_value = row.get("categories")
+        categories = [category_value] if category_value else []
+        return {"status": "OK", "task_id": task_id, "categories": categories}
+    except mysql.connector.Error as err:
+        raise HTTPException(status_code=500, detail=str(err)) from err
+    finally:
+        if sql.is_connected():
+            cursor.close()
+            sql.close()
+
+
 @router.delete("/{task_id}")
 async def delete_task(task_id: int):
     """Delete task by ID"""

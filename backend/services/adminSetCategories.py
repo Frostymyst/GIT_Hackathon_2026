@@ -39,9 +39,9 @@ def create_category(
 	try:
 		connection = mysql.connector.connect(
 			host=os.getenv("MYSQL_HOST", "127.0.0.1"),
-			port=int(os.getenv("MYSQL_PORT", "3306")),
-			user=os.getenv("MYSQL_USER", "root"),
-			password=os.getenv("MYSQL_PASSWORD", ""),
+			port=int(os.getenv("MYSQL_PORT", "3309")),
+			user=os.getenv("MYSQL_USER", "tasklist"),
+			password=os.getenv("MYSQL_PASSWORD", "password"),
 			database=os.getenv("MYSQL_DB", "tasklist"),
 		)
 		return insert_category(
@@ -60,7 +60,11 @@ def delete_category_row(
 	cname: str,
 ) -> bool:
 	"""Delete a category row and return a success flag."""
-	query = (
+	delete_dept_mapping_query = (
+		"DELETE FROM dept_categories "
+		"WHERE cname = %s"
+	)
+	delete_category_query = (
 		"DELETE FROM task_categories "
 		"WHERE cname = %s"
 	)
@@ -68,7 +72,13 @@ def delete_category_row(
 	cursor = connection.cursor()
 	try:
 		cursor.execute(
-			query,
+			delete_dept_mapping_query,
+			(
+				cname,
+			),
+		)
+		cursor.execute(
+			delete_category_query,
 			(
 				cname,
 			),
@@ -87,9 +97,9 @@ def delete_category(
 	try:
 		connection = mysql.connector.connect(
 			host=os.getenv("MYSQL_HOST", "127.0.0.1"),
-			port=int(os.getenv("MYSQL_PORT", "3306")),
-			user=os.getenv("MYSQL_USER", "root"),
-			password=os.getenv("MYSQL_PASSWORD", ""),
+			port=int(os.getenv("MYSQL_PORT", "3309")),
+			user=os.getenv("MYSQL_USER", "tasklist"),
+			password=os.getenv("MYSQL_PASSWORD", "password"),
 			database=os.getenv("MYSQL_DB", "tasklist"),
 		)
 		return delete_category_row(
