@@ -60,8 +60,8 @@ function EmployeeLookup() {
           </thead>
           <tbody>
             {results.map((employee) => (
-              <tr key={employee.id || employee.employee_id || employee.email}>
-                <td>{employee.id || employee.employee_id || '-'}</td>
+              <tr key={employee.eno || employee.id || employee.employee_id || employee.email}>
+                <td>{employee.eno || employee.id || employee.employee_id || '-'}</td>
                 <td>{employee.name || employee.ename || '-'}</td>
                 <td>{employee.email || '-'}</td>
                 <td>{employee.department || employee.dname || employee.dno || '-'}</td>
