@@ -126,3 +126,9 @@
 .EmailSend:hover {
   filter: brightness(0.98);
 }
+
+.task-email-area {
+  border: 1px solid black;
+  border-radius: 4px;
+  min-height: 10rem;
+}

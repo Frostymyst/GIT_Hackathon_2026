@@ -101,9 +101,10 @@ function TaskInspectPage({ user, taskId, onNavigate, onLogout }) {
                 <span className="task-inspect-value">{task.description || 'No description available.'}</span>
               </div>
               <form className='task-inspect-item task-inspect-item-wide' onSubmit={handleEmail}>
-                <textarea className='task-email-area'>
+                <span className="task-inspect-label">Reply to Customer</span>
+                <textarea className='task-email-area' placeholder='Dear Mr/Ms/Mrs/Mx...'>
                 </textarea>
-                <button type='submit' className='EmailSend'>Reply to Customer</button>
+                <button type='submit' className='EmailSend'>Send</button>
               </form>
             </div>
           )}
