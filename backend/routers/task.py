@@ -28,7 +28,7 @@ class ReplyContent(BaseModel):
     content: str
 
 
-@router.get("/")
+@router.get("")
 async def get_tasks(category: str | None = None, cname: str | None = None):
     """Get all tasks, or get tasks by category"""
     sql, cursor = connection()
@@ -55,7 +55,7 @@ async def get_tasks(category: str | None = None, cname: str | None = None):
             sql.close()
 
 
-@router.post("/")
+@router.post("")
 async def make_new_task(task_data: CreateTaskRequest):
     """Create a new task"""
     email = task_data.email
