@@ -23,7 +23,14 @@ function Header({ user, onNavigate, onLogout, activeView = 'main' }) {
     return (
         <nav className='Navbar'>
             <div className='NavBrand'>
-                <img src='/Catasktrophy.svg' alt='Catasktrophy' className='NavBrandLogo' />
+                <button
+                    type='button'
+                    className='NavBrandButton'
+                    onClick={(event) => handleNavigate(event, 'main')}
+                    aria-label='Go to main task list'
+                >
+                    <img src='/Catasktrophy.svg' alt='Catasktrophy' className='NavBrandLogo' />
+                </button>
             </div>
 
             <div className='NavActions'>
