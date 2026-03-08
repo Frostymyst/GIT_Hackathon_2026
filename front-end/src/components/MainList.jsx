@@ -1,20 +1,37 @@
+import { useState } from 'react';
 import Header from './Header'
 import './MainList.css'
 import Ticket from './Ticket';
 
+
 function MainList({ user, onNavigate, onLogout }) {
-    let tickets; let ids;
+    let tickets; let ids; let tags;
     const req = new XMLHttpRequest();
+    const cate = new XMLHttpRequest();
     req.onload = () => {
         let taskResp = JSON.parse(req.responseText).tasks;
-        tickets = taskResp.map((e) => <Ticket user={user} title={e.name} desc={e.summary} keywords={e.categories} id={e.tno}/>)
+        tickets = taskResp.map((e) => <Ticket user={user} title={e.name} desc={e.summary} keywords={e.categories} id={e.tno}/>);
         ids = taskResp.map((e) => <>
         <option>{e.tno}</option><option>{e.name}</option>
         </>)
     }
 
+    const handleSort = (event) => {
+        let cat = event.target.id;
+        const catReq = new XMLHttpRequest();
+        catReq.open("GET", "")
+    }
+
+    cate.onload = () => {
+        let cateResp = JSON.parse(cate.responseText).categories;
+        tags = cateResp.map((e) => <li id={e.cname} key={e.cname} onClick={handleSort}>{e.cname}</li>)
+        console.log(tags)
+    }
+
     req.open("GET", "http://127.0.0.1:8000/task", false)
     req.send()
+    cate.open("GET", "http://127.0.0.1:8000/admin/categories", false)
+    cate.send()
     /*req.setRequestHeader("Content-Type", "application/json")
     req.send(JSON.stringify({
         email:"test@example.com",
@@ -37,7 +54,7 @@ function MainList({ user, onNavigate, onLogout }) {
                                 Search for a Specific Ticket
                             </h4>
                         </label>
-                        <input type='search' name='search' id='TicketSearch' list='tickets' placeholder='Enter a Ticket Number'/> 
+                        <input type='search' name='search' id='TicketSearch' list='tickets' placeholder='Enter a Ticket Number or Name'/> 
                         <datalist id='tickets'>
                             {ids}
                         </datalist>
@@ -48,8 +65,8 @@ function MainList({ user, onNavigate, onLogout }) {
                         <h4>
                             Filter by Tags/Keywords:
                         </h4>
-                        <ul>
-                            {/*Add keywords here*/}
+                        <ul id='TagList'>
+                            {tags}
                         </ul>
                     </div>
                     <div id='CreateDiv'>
