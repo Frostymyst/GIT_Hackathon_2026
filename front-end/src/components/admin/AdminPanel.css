@@ -121,6 +121,10 @@
   cursor: pointer;
 }
 
+.admin-btn i {
+  margin-right: 0.45rem;
+}
+
 .admin-btn:hover {
   filter: brightness(1.08);
 }
@@ -143,6 +147,10 @@
   margin: 0;
   color: #334155;
   font-size: 0.92rem;
+}
+
+.admin-file-input-hidden {
+  display: none;
 }
 
 .admin-table {

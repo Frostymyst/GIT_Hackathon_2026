@@ -68,6 +68,17 @@ function getTaskCategories() {
   return getCategories();
 }
 
+function exportAdminData() {
+  return request('/admin/export');
+}
+
+function importAdminData(payload) {
+  return request('/admin/import', {
+    method: 'POST',
+    body: payload,
+  });
+}
+
 export {
   getCategories,
   createCategory,
@@ -81,4 +92,6 @@ export {
   assignCategoryToDepartment,
   removeCategoryFromDepartment,
   getTaskCategories,
+  exportAdminData,
+  importAdminData,
 };
