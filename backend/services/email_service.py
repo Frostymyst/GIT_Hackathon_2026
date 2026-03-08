@@ -69,13 +69,19 @@ def fetch_emails(n: int, offset: int = 0):
 # SMTP - Send a test email
 def send_email(to: str, subject: str, id: int, body: str, reply_to: str | None = None, references: str | None = None):
     print("\n=== Sending Test Email (SMTP) ===")
-    msg = MIMEMultipart()
+    msg = MIMEMultipart("alternative")
     msg["From"] = EMAIL
     msg["To"] = to
     clean_subject = re.sub(r"\s*\(ID:\s*\d+\)", "", subject).strip()
     clean_subject = re.sub(r"^(Re:\s*)+", "", clean_subject, flags=re.IGNORECASE).strip()
     msg["Subject"] = f"Re: {clean_subject} (ID: {id})"
+    html_body = "".join(
+        f"<p>{line}</p>" if line.strip() else "<br>"
+        for line in body.splitlines()
+    )
+    html = f"<html><body>{html_body}</body></html>"
     msg.attach(MIMEText(body, "plain"))
+    msg.attach(MIMEText(html, "html"))
 
     if reply_to:
         msg["In-Reply-To"] = reply_to
