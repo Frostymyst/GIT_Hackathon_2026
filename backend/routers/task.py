@@ -2,10 +2,13 @@ from fastapi import APIRouter, HTTPException
 from services.starvationOrganizer import fetch_starving_task_ids
 from pydantic import BaseModel
 from services.llm import LLM
-from services.createTask import create_task
+from services.createTask import create_task, update_task
+from services.email_service import send_email
 from datetime import date
 import mysql.connector
 from database import connection
+
+EMPLOYEE_REPLY_SEP = "\n\n--- Employee reply ---\n\n"
 
 router = APIRouter(prefix="/task", tags=["task"])
 ai = LLM()
@@ -19,6 +22,10 @@ class CreateTaskRequest(BaseModel):
 
 class UpdateTaskCategoryRequest(BaseModel):
     category: str
+
+
+class ReplyContent(BaseModel):
+    content: str
 
 
 @router.get("/")
@@ -215,6 +222,54 @@ async def assign_task(task_id: int, employee_id: int | None = None):
             )
         sql.commit()
         return {"status": "OK", "task_id": task_id, "employee_id": employee_id}
+    except mysql.connector.Error as err:
+        raise HTTPException(status_code=500, detail=str(err)) from err
+    finally:
+        if sql.is_connected():
+            cursor.close()
+            sql.close()
+
+
+@router.post("/{task_id}/reply")
+async def reply_to_task(task_id: int, data: ReplyContent):
+    """Send an employee reply to the customer by email and append it to the task thread."""
+    content = (data.content or "").strip()
+    if not content:
+        raise HTTPException(status_code=400, detail="Reply content is required")
+
+    sql, cursor = connection()
+    try:
+        cursor.execute(
+            "SELECT tno, email, name, summary, description, categories, status FROM task WHERE tno = %s",
+            (task_id,),
+        )
+        task = cursor.fetchone()
+        if not task:
+            raise HTTPException(status_code=404, detail="Task not found")
+
+        customer_email = task.get("email")
+        if not customer_email:
+            raise HTTPException(
+                status_code=400, detail="Task has no customer email to reply to"
+            )
+
+        subject = f"Re: {task["name"]}"
+        send_email(customer_email, subject, task_id, content, reply_to=None)
+
+        existing_description = task.get("description") or ""
+        new_description = existing_description + EMPLOYEE_REPLY_SEP + content
+        update_task(
+            tno=task_id,
+            name=task["name"],
+            email=customer_email,
+            summary=task["summary"] or "",
+            description=new_description,
+            category=task.get("categories"),
+            status=task["status"],
+        )
+        return {"status": "OK", "message": "Reply sent"}
+    except HTTPException:
+        raise
     except mysql.connector.Error as err:
         raise HTTPException(status_code=500, detail=str(err)) from err
     finally:
