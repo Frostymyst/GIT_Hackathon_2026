@@ -63,3 +63,25 @@
     font-weight: 500;
     cursor: pointer;
 }
+
+#CreateBtn {
+    padding: 10px;
+    margin: auto auto;
+    font-size: 1.1rem;
+	background: #fff;
+	border: 2px solid #222;
+	border-radius: 6px;
+	box-shadow: 2px 2px 0 #888;
+	cursor: pointer;
+	transition: background 0.2s;
+}
+#CreateBtn:hover {
+    background: #f0f0f0;
+}
+
+#CreateDiv {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 20px;
+}
