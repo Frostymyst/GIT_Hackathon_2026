@@ -3,6 +3,10 @@ import Header from '../Header';
 import { getTaskById, getTaskCategories, updateTaskCategory } from '../../api/taskApi';
 import './TaskInspectPage.css';
 
+function handleEmail(event) {
+  
+}
+
 function formatDate(value) {
   if (!value) {
     return 'Not set';
@@ -194,6 +198,11 @@ function TaskInspectPage({ user, taskId, onNavigate, onLogout }) {
                 <span className="task-inspect-label">Description</span>
                 <span className="task-inspect-value">{task.description || 'No description available.'}</span>
               </div>
+              <form className='task-inspect-item task-inspect-item-wide' onSubmit={handleEmail}>
+                <textarea className='task-email-area'>
+                </textarea>
+                <button type='submit' className='EmailSend'>Reply to Customer</button>
+              </form>
             </div>
           )}
         </section>
