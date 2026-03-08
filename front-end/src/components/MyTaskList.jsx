@@ -2,17 +2,14 @@ import { useEffect, useState } from 'react';
 import Header from './Header';
 import './MainList.css';
 import Ticket from './Ticket';
+import { getTasksByEmployee } from '../api/taskApi';
 
 function MyTaskList({ user, onNavigate, onLogout }) {
   const [tasks, setTasks] = useState([]);
+  const [allMyTasks, setAllMyTasks] = useState([]);
   const [ids, setIds] = useState([]);
   const [tags, setTags] = useState([]);
   const [employeeDirectory, setEmployeeDirectory] = useState([]);
-
-  const isMyTask = (task) => {
-    const assignedId = task?.assigned_to ?? task?.assignedTo ?? null;
-    return assignedId !== null && String(assignedId) === String(user?.id);
-  };
 
   const getAssignedToLabel = (task) => {
     const assignedId = task?.assigned_to ?? task?.assignedTo ?? task?.eno;
@@ -33,36 +30,34 @@ function MyTaskList({ user, onNavigate, onLogout }) {
   };
 
   const handleSort = (event) => {
-    const url = `http://127.0.0.1:8000/task?category=${event.target.id}&cname=`;
-    const catReq = new XMLHttpRequest();
-
-    catReq.onload = () => {
-      const response = JSON.parse(catReq.responseText);
-      const rows = Array.isArray(response?.tasks) ? response.tasks : [];
-      const myTasks = rows.filter(isMyTask);
-      setTasks(myTasks);
-      setIds(myTasks.map((task) => (
-        <option key={`my-task-id-${task.tno}`} value={String(task.tno)}>{task.tno}</option>
-      )));
-    };
-
-    catReq.open('GET', url);
-    catReq.send();
+    const selectedCategory = String(event.target.id || '').toLowerCase();
+    const filtered = allMyTasks.filter((task) =>
+      String(task?.categories || '').toLowerCase() === selectedCategory
+    );
+    setTasks(filtered);
+    setIds(filtered.map((task) => (
+      <option key={`my-task-id-${task.tno}`} value={String(task.tno)}>{task.tno}</option>
+    )));
   };
 
   useEffect(() => {
-    const req = new XMLHttpRequest();
-    req.onload = () => {
-      const response = JSON.parse(req.responseText);
-      const rows = Array.isArray(response?.tasks) ? response.tasks : [];
-      const myTasks = rows.filter(isMyTask);
-      setTasks(myTasks);
-      setIds(myTasks.map((task) => (
-        <option key={`my-task-id-${task.tno}`} value={String(task.tno)}>{task.tno}</option>
-      )));
-    };
-    req.open('GET', 'http://127.0.0.1:8000/task');
-    req.send();
+    async function loadMyTasks() {
+      try {
+        const response = await getTasksByEmployee(user?.id);
+        const rows = Array.isArray(response?.tasks) ? response.tasks : [];
+        setAllMyTasks(rows);
+        setTasks(rows);
+        setIds(rows.map((task) => (
+          <option key={`my-task-id-${task.tno}`} value={String(task.tno)}>{task.tno}</option>
+        )));
+      } catch {
+        setAllMyTasks([]);
+        setTasks([]);
+        setIds([]);
+      }
+    }
+
+    loadMyTasks();
 
     const cate = new XMLHttpRequest();
     cate.onload = () => {

@@ -24,6 +24,16 @@
     min-width: 420px;
 }
 
+.NavBrandButton {
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+}
+
 .NavBrandLogo {
     width: auto;
     height: 88px;

@@ -11,6 +11,10 @@ function getTasks(params = {}) {
   return request(`/task/${suffix}`);
 }
 
+function getTasksByEmployee(employeeId) {
+  return request(`/task/email/${employeeId}`);
+}
+
 function getTaskById(taskId) {
   return request(`/task/${taskId}`);
 }
@@ -26,4 +30,4 @@ function createTask(payload) {
   });
 }
 
-export { getTasks, getTaskById, createTask };
+export { getTasks, getTasksByEmployee, getTaskById, createTask };
