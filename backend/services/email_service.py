@@ -50,13 +50,15 @@ def fetch_emails(n: int, offset: int = 0):
                 payload = msg.get_payload(decode=True)
                 if isinstance(payload, bytes):
                     body = payload.decode(errors="replace")
+            raw_msg_id = msg["Message-ID"] or ""
+            raw_refs = msg["References"] or None
             email_list.append(
                 emailMsg(
                     uid=uid,
                     sender=msg["From"],
                     subject=msg["Subject"],
-                    message_id=msg["Message-ID"],
-                    references=msg["References"],
+                    message_id=" ".join(raw_msg_id.split()),
+                    references=" ".join(raw_refs.split()) if raw_refs else None,
                     date=msg["Date"],
                     body=body,
                 )
