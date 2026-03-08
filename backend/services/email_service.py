@@ -72,7 +72,7 @@ def send_email(to: str, subject: str, id: int, body: str):
 
     with smtplib.SMTP_SSL(SMTP_SERVER, 465) as server:
         server.login(EMAIL, SMTP_PASSWORD)
-        server.sendmail(EMAIL, EMAIL, msg.as_string())
+        server.sendmail(EMAIL, to, msg.as_string())
     print("Email sent successfully.")
 
 
