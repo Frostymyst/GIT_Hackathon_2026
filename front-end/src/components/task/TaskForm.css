@@ -126,6 +126,10 @@ select.task-input {
   letter-spacing: 0.01em;
   font-weight: 700;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   box-shadow: 0 12px 22px rgba(10, 88, 202, 0.28);
   transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.2s ease;
 }
