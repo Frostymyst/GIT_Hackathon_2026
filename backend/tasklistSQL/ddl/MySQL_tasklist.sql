@@ -56,7 +56,8 @@ INSERT INTO task_categories (cname) VALUES ('Shipping'), ('Returns'), ('Damaged'
 INSERT INTO employees (ename, email, epassword, phonenumber, bdate, salary, title, hired_date, dno) VALUES 
 ('Alice Smith', 'alice.smith@example.com', 'password123', '123-456-7890', '1985-06-15', 60000.00, 'Tier 1', '2020-01-15', 1), 
 ('Bob Johnson', 'bob.johnson@example.com', 'password123', '234-567-8901', '1990-07-20', 65000.00, 'Tier 2', '2019-03-10', 2), 
-('Charlie Brown', 'charlie.brown@example.com', 'password123', '345-678-9012', '1988-09-25', 70000.00, 'Tier 1', '2021-06-05', 2);
+('Charlie Brown', 'charlie.brown@example.com', 'password123', '345-678-9012', '1988-09-25', 70000.00, 'Tier 1', '2021-06-05', 2),
+('Cody Underline', 'cody.underline@example.com', 'password123', '345-678-6767', '1988-09-25', 80000.00, 'Tier 3', '2020-01-05', 2);
 
 INSERT INTO task (email, summary, description, status, due_date, post_date, ordering_access_date, assigned_to, categories) VALUES 
 ('susy.smith@example.com', 'Process return for order #12345', 'Customer wants to return a defective product. Please process the return and issue a refund.', 'new', '2024-07-01', '2024-06-20', '2024-06-20', 1, 'Returns'),
