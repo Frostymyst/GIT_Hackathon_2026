@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import Header from '../Header';
-import { getTaskById } from '../../api/taskApi';
+import { getTaskById, getTaskCategories, updateTaskCategory } from '../../api/taskApi';
 import './TaskInspectPage.css';
 
 function formatDate(value) {
@@ -19,6 +19,11 @@ function formatDate(value) {
 function TaskInspectPage({ user, taskId, onNavigate, onLogout }) {
   const [task, setTask] = useState(null);
   const [status, setStatus] = useState('Loading task details...');
+  const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
+  const [categoryOptions, setCategoryOptions] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [isSavingCategory, setIsSavingCategory] = useState(false);
+  const [categoryStatus, setCategoryStatus] = useState('');
 
   useEffect(() => {
     async function loadTask() {
@@ -31,8 +36,10 @@ function TaskInspectPage({ user, taskId, onNavigate, onLogout }) {
       setStatus('Loading task details...');
       try {
         const response = await getTaskById(taskId);
-        setTask(response?.task || null);
-        setStatus(response?.task ? '' : 'Task not found.');
+        const nextTask = response?.task || null;
+        setTask(nextTask);
+        setStatus(nextTask ? '' : 'Task not found.');
+        setSelectedCategory(nextTask?.categories || '');
       } catch (error) {
         setTask(null);
         setStatus(error.message || 'Unable to load task details.');
@@ -42,6 +49,22 @@ function TaskInspectPage({ user, taskId, onNavigate, onLogout }) {
     loadTask();
   }, [taskId]);
 
+  useEffect(() => {
+    async function loadCategoryOptions() {
+      try {
+        const response = await getTaskCategories();
+        const normalized = (response?.categories || [])
+          .map((row) => row?.cname)
+          .filter(Boolean);
+        setCategoryOptions(normalized);
+      } catch {
+        setCategoryOptions([]);
+      }
+    }
+
+    loadCategoryOptions();
+  }, []);
+
   const taskTitle = useMemo(() => {
     if (!task) {
       return 'Task Details';
@@ -49,6 +72,34 @@ function TaskInspectPage({ user, taskId, onNavigate, onLogout }) {
 
     return task.name || `Task #${task.tno || taskId}`;
   }, [task, taskId]);
+
+  async function handleCategorySave(event) {
+    event.preventDefault();
+    if (!task?.tno || !selectedCategory) {
+      return;
+    }
+
+    setIsSavingCategory(true);
+    setCategoryStatus('');
+    try {
+      const response = await updateTaskCategory(task.tno, selectedCategory);
+      const nextCategory = response?.category || selectedCategory;
+      setTask((prev) => (prev ? { ...prev, categories: nextCategory } : prev));
+      setSelectedCategory(nextCategory);
+      setCategoryStatus('Category updated.');
+      setIsCategoryMenuOpen(false);
+    } catch (error) {
+      setCategoryStatus(error.message || 'Unable to update category.');
+    } finally {
+      setIsSavingCategory(false);
+    }
+  }
+
+  function handleCategoryCancel() {
+    setSelectedCategory(task?.categories || '');
+    setCategoryStatus('');
+    setIsCategoryMenuOpen(false);
+  }
 
   return (
     <div className="task-inspect-page">
@@ -82,7 +133,54 @@ function TaskInspectPage({ user, taskId, onNavigate, onLogout }) {
               </div>
               <div className="task-inspect-item">
                 <span className="task-inspect-label">Category</span>
-                <span className="task-inspect-value">{task.categories || 'Uncategorized'}</span>
+                <div className="task-inspect-category-row">
+                  <span className="task-inspect-value">{task.categories || 'Uncategorized'}</span>
+                  <div className="task-inspect-category-actions">
+                    <button
+                      type="button"
+                      className="task-inspect-category-btn"
+                      onClick={() => {
+                        setCategoryStatus('');
+                        setIsCategoryMenuOpen((open) => !open);
+                      }}
+                    >
+                      Change
+                    </button>
+                    {isCategoryMenuOpen && (
+                      <form className="task-inspect-category-menu" onSubmit={handleCategorySave}>
+                        <select
+                          className="task-inspect-category-select"
+                          value={selectedCategory}
+                          onChange={(event) => setSelectedCategory(event.target.value)}
+                          disabled={isSavingCategory}
+                        >
+                          <option value="">Select category</option>
+                          {categoryOptions.map((categoryName) => (
+                            <option key={categoryName} value={categoryName}>{categoryName}</option>
+                          ))}
+                        </select>
+                        <div className="task-inspect-category-menu-actions">
+                          <button
+                            type="submit"
+                            className="task-inspect-category-btn"
+                            disabled={!selectedCategory || isSavingCategory}
+                          >
+                            Save
+                          </button>
+                          <button
+                            type="button"
+                            className="task-inspect-category-btn"
+                            onClick={handleCategoryCancel}
+                            disabled={isSavingCategory}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    )}
+                  </div>
+                </div>
+                {categoryStatus && <span className="task-inspect-inline-message">{categoryStatus}</span>}
               </div>
               <div className="task-inspect-item">
                 <span className="task-inspect-label">Due Date</span>
