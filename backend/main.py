@@ -5,6 +5,7 @@ import os
 
 from database import connection
 from routers import admin, employee, task
+from routers import emails as email_router
 
 app = FastAPI()
 
@@ -23,6 +24,7 @@ app.add_middleware(
 app.include_router(employee.router)
 app.include_router(task.router)
 app.include_router(admin.router)
+app.include_router(email_router.router)
 
 app.add_middleware(
     CORSMiddleware,
