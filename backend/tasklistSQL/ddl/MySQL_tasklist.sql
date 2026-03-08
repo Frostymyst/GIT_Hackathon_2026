@@ -76,10 +76,10 @@ INSERT INTO employees (ename, email, epassword, phonenumber, bdate, salary, titl
 ('Charlie Brown', 'charlie.brown@example.com', 'password123', '345-678-9012', '1988-09-25', 70000.00, 'Tier 1', '2021-06-05', 2),
 ('Cody Underline', 'cody.underline@example.com', 'password123', '345-678-6767', '1988-09-25', 80000.00, 'Tier 3', '2020-01-05', 2);
 
-INSERT INTO task (email, summary, description, status, due_date, post_date, ordering_access_date, assigned_to, categories) VALUES 
-('susy.smith@example.com', 'Process return for order #12345', 'Customer wants to return a defective product. Please process the return and issue a refund.', 'new', '2024-07-01', '2024-06-20', '2024-06-20', 1, 'Returns'),
-('caleb.carter@example.com', 'Investigate delayed shipment for order #54321', 'Customer reports that their order has not arrived on time. Please investigate the issue and provide an update.', 'in-progress', '2024-07-05', '2024-06-18', '2024-06-19', 2, 'Shipping'),
-('david.wilson@example.com', 'Resolve pricing discrepancy for order #67890', 'Customer claims that the price charged does not match the advertised price. Please review and adjust accordingly.', 'delayed', '2024-07-10', '2024-06-22', '2024-06-22', 3, 'Price Match');
+INSERT INTO task (email, name, summary, description, status, due_date, post_date, ordering_access_date, assigned_to, categories) VALUES
+('susy.smith@example.com', 'Process return for order #12345', 'Process return for order #12345', 'Customer wants to return a defective product. Please process the return and issue a refund.', 'new', '2024-07-01', '2024-06-20', '2024-06-20', 1, 'Returns'),
+('caleb.carter@example.com', 'Investigate delayed shipment for order #54321', 'Investigate delayed shipment for order #54321', 'Customer reports that their order has not arrived on time. Please investigate the issue and provide an update.', 'in-progress', '2024-07-05', '2024-06-18', '2024-06-19', 2, 'Shipping'),
+('david.wilson@example.com', 'Resolve pricing discrepancy for order #67890', 'Resolve pricing discrepancy for order #67890', 'Customer claims that the price charged does not match the advertised price. Please review and adjust accordingly.', 'delayed', '2024-07-10', '2024-06-22', '2024-06-22', 3, 'Price Match');
 
 INSERT INTO workson (eno, tno) VALUES 
 (1, 1), 
