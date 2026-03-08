@@ -206,7 +206,7 @@ async def assign_task(task_id: int, employee_id: int | None = None):
 
         if employee_id is not None:
             cursor.execute(
-                "UPDATE task SET assigned_to = %s WHERE tno = %s",
+                "UPDATE task SET assigned_to = %s, status = 'in-progress' WHERE tno = %s",
                 (employee_id, task_id),
             )
         else:
