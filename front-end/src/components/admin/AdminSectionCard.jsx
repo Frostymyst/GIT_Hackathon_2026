@@ -4,6 +4,7 @@ const iconByTitle = {
   'Employee Lookup': 'fa-solid fa-users-viewfinder',
   'Assign Categories to Departments': 'fa-solid fa-diagram-successor',
   'Department Management': 'fa-solid fa-building-user',
+  'Import / Export': 'fa-solid fa-file-import',
 };
 
 function AdminSectionCard({ title, children }) {
