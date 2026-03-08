@@ -10,6 +10,7 @@ from database import connection
 router = APIRouter(prefix="/task", tags=["task"])
 ai = LLM()
 
+
 class CreateTaskRequest(BaseModel):
     email: str | None = None
     description: str
@@ -68,11 +69,15 @@ async def make_new_task(task_data: CreateTaskRequest):
 
     name = ai_response.name
     summary = ai_response.summary
-    category = ai_response.category.strip() if isinstance(ai_response.category, str) else None
+    category = (
+        ai_response.category.strip() if isinstance(ai_response.category, str) else None
+    )
 
     # Tasks are modeled with a single category value.
     if isinstance(category, str) and "," in category:
-        raise HTTPException(status_code=400, detail="Task category must be a single value")
+        raise HTTPException(
+            status_code=400, detail="Task category must be a single value"
+        )
 
     if category is not None:
         # Normalize LLM output to an existing category value (case-insensitive).
@@ -153,6 +158,43 @@ async def get_task_categories_by_id(task_id: int):
         category_value = row.get("categories")
         categories = [category_value] if category_value else []
         return {"status": "OK", "task_id": task_id, "categories": categories}
+    except mysql.connector.Error as err:
+        raise HTTPException(status_code=500, detail=str(err)) from err
+    finally:
+        if sql.is_connected():
+            cursor.close()
+            sql.close()
+
+
+@router.patch("/{task_id}/assign")
+async def assign_task(task_id: int, employee_id: int | None = None):
+    """Assign a task to an employee. If no employee_id is provided, the task will be unassigned."""
+    sql, cursor = connection()
+    try:
+        # Check if the task exists
+        cursor.execute("SELECT tno FROM task WHERE tno = %s", (task_id,))
+        found_task = cursor.fetchone()
+        if not found_task:
+            raise HTTPException(status_code=404, detail="Task not found")
+
+        # If an employee_id is provided, check if the employee exists
+        if employee_id is not None:
+            cursor.execute("SELECT eno FROM employees WHERE eno = %s", (employee_id,))
+            found_employee = cursor.fetchone()
+            if not found_employee:
+                raise HTTPException(status_code=404, detail="Employee not found")
+
+        if employee_id is not None:
+            cursor.execute(
+                "UPDATE task SET assigned_to = %s WHERE tno = %s",
+                (employee_id, task_id),
+            )
+        else:
+            cursor.execute(
+                "UPDATE task SET assigned_to = NULL WHERE tno = %s", (task_id,)
+            )
+        sql.commit()
+        return {"status": "OK", "task_id": task_id, "employee_id": employee_id}
     except mysql.connector.Error as err:
         raise HTTPException(status_code=500, detail=str(err)) from err
     finally:
