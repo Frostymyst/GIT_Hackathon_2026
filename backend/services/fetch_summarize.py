@@ -35,7 +35,7 @@ def process_batch(batch: list, ai: LLM, dry_run: bool = False):
         sql, cursor = connection()
         try:
             cursor.execute("SELECT cname FROM task_categories")
-            categories = list(cursor.fetchall())
+            categories = [str(row["cname"]) for row in cursor.fetchall()]
         except Exception as exc:
             print(f"Failed to fetch categories: {exc}")
             categories = []
