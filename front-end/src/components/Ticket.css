@@ -1,32 +1,40 @@
 .TaskView {
-    border: 2px black solid;
-    padding: 5px;
+    width: min(1180px, 95%);
+    margin: 0 auto 12px;
+    border: 1px solid #d7e3ef;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 10px 22px rgba(13, 33, 59, 0.08);
+    padding: 14px;
     text-align: left;
-    width: 95%;
-    margin: auto;
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    gap: 14px;
+    box-sizing: border-box;
 }
 
 .TaskView ul {
     list-style-type: none;
-    padding-left: 0%;
+    padding-left: 0;
+    margin: 8px 0 0;
 }
 
 .TaskView ul li {
-    border: 2px black solid;
-    background-color: azure;
-    border-radius: 5px;
-    display: inline;
-    margin: 0.2rem;
-    padding: 0.4rem;
-    font-size: 1.1rem;
-    font-weight: 500;
+    border: 1px solid #cfe0f1;
+    background: #f6fbff;
+    border-radius: 999px;
+    display: inline-flex;
+    margin: 0;
+    padding: 6px 11px;
+    font-size: 0.92rem;
+    color: #244260;
+    font-weight: 600;
 }
 
 .TaskInfo {
-    max-width: 40%;
+    width: 54%;
+    max-width: 54%;
 }
 
 .TaskTitle {
@@ -38,49 +46,157 @@
     padding: 0;
     background: none;
     color: #1f2937;
-    font-size: 1.2rem;
+    font-size: 1.85rem;
     font-weight: 700;
     cursor: pointer;
     text-align: left;
+    line-height: 1.2;
 }
 
 .InspectLink:hover {
-    text-decoration: underline;
     color: #3d9970;
+    text-decoration: underline;
+}
+
+.TaskDescription {
+    margin: 10px 0 0;
+    color: #213a56;
+    line-height: 1.38;
+    font-size: 1rem;
+}
+
+.AssignedToText {
+    margin: 10px 0 0;
+    color: #2b4967;
+    font-size: 0.92rem;
+}
+
+.AssignedToText span {
+    font-weight: 700;
+    color: #1f344f;
+}
+
+.TaskView h4 {
+    margin: 2px 0 0;
+    font-size: 1.65rem;
+    color: #1f344f;
+}
+
+.TaskTags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .AssignBtn {
-    padding: 10px;
-    margin: auto 15px;
-    font-size: 1.1rem;
-	background: #fff;
-	border: 2px solid #222;
-	border-radius: 6px;
-	box-shadow: 2px 2px 0 #888;
+    min-height: 44px;
+    padding: 0 14px;
+    margin: 0;
+    font-size: 0.96rem;
+	background: #ffffff;
+	border: 1.5px solid #bcccdc;
+	border-radius: 10px;
+	box-shadow: 0 8px 16px rgba(14, 35, 60, 0.09);
+	font-weight: 700;
+	color: #1f344f;
 	cursor: pointer;
-	transition: background 0.2s;
+	transition: transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease;
 }
+
 .AssignBtn:hover {
-    background: #f0f0f0;
+    background: #f5fbf8;
+    border-color: #9ec7b3;
+    transform: translateY(-1px);
 }
 
 .TaskBtns {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-left: auto;
+    position: relative;
+    align-self: center;
 }
 
 .AssignForm {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
 }
-.AssingForm select {
-    padding: 0 2px;
-	background: #fff;
-	border: 2px solid #222;
-	border-radius: 6px;
-	box-shadow: 2px 2px 0 #888;
+
+.AssignFormMenu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    z-index: 20;
+    min-width: 230px;
+    border: 1px solid #d2dfed;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 14px 30px rgba(13, 33, 59, 0.16);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.AssignSelect {
+    min-height: 44px;
+    padding: 7px 9px;
+	background: #f8fbff;
+	border: 1.5px solid #bfccdc;
+	border-radius: 10px;
+	box-shadow: 0 6px 14px rgba(13, 33, 59, 0.08);
+	color: #1f344f;
+	font-size: 0.92rem;
 	cursor: pointer;
-    width: 75%;
+    min-width: 120px;
+}
+
+.AssignMenuBtns {
+    display: flex;
+    gap: 8px;
+}
+
+.AssignMenuBtns .AssignBtn {
+    min-height: 38px;
+    padding: 0 10px;
+}
+
+@media (max-width: 1100px) {
+    .TaskView {
+        flex-wrap: wrap;
+    }
+
+    .TaskInfo {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .TaskBtns {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .AssignFormMenu {
+        right: auto;
+        left: 0;
+    }
+}
+
+@media (max-width: 700px) {
+    .InspectLink {
+        font-size: 1.4rem;
+    }
+
+    .TaskView h4 {
+        font-size: 1.25rem;
+    }
+
+    .AssignForm {
+        flex-wrap: wrap;
+    }
 }

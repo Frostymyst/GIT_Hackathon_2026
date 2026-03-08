@@ -35,7 +35,7 @@ function Header({ user, onNavigate, onLogout, activeView = 'main' }) {
                         </a>
                     </li>
                     <li id='UserList' className={activeView === 'my-tasks' ? 'bold' : ''}>
-                        <a href='#' className='nav-link'>
+                        <a href='#' className='nav-link' onClick={(event) => handleNavigate(event, 'my-tasks')}>
                             <i className='fa-solid fa-clipboard-list' aria-hidden='true' />
                             <span>My Task List</span>
                         </a>

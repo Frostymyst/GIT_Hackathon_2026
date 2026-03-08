@@ -8,6 +8,25 @@ function MainList({ user, onNavigate, onLogout }) {
     let [tasks, setTasks] = useState([]); 
     let [ids, setIds] = useState([]); 
     let [tags, setTags] = useState([]);
+    let [employeeDirectory, setEmployeeDirectory] = useState([]);
+
+    const getAssignedToLabel = (task) => {
+        const assignedId = task?.assigned_to ?? task?.assignedTo ?? task?.eno;
+        if (!assignedId) {
+            return 'Unassigned';
+        }
+
+        const matched = employeeDirectory.find((employee) => {
+            const employeeId = employee?.eno ?? employee?.id;
+            return String(employeeId) === String(assignedId);
+        });
+
+        if (!matched) {
+            return `Employee #${assignedId}`;
+        }
+
+        return matched.ename || matched.name || `Employee #${assignedId}`;
+    };
 
     const handleSort = (event) => {
         let cat = "http://127.0.0.1:8000/task?category="+event.target.id+"&cname=";
@@ -44,6 +63,15 @@ function MainList({ user, onNavigate, onLogout }) {
         };
         cate.open("GET", "http://127.0.0.1:8000/admin/categories");
         cate.send();
+
+        // Fetch employee directory for assignment rules
+        const employeesReq = new XMLHttpRequest();
+        employeesReq.onload = () => {
+            const employeesResp = JSON.parse(employeesReq.responseText).employees;
+            setEmployeeDirectory(Array.isArray(employeesResp) ? employeesResp : []);
+        };
+        employeesReq.open("GET", "http://127.0.0.1:8000/employee/search?query=");
+        employeesReq.send();
     }, []);
 
   return (
@@ -94,6 +122,8 @@ function MainList({ user, onNavigate, onLogout }) {
                 desc={task.summary}
                 keywords={task.categories}
                 id={task.tno}
+                assignedTo={getAssignedToLabel(task)}
+                assigneeDirectory={employeeDirectory}
                 onInspect={(taskId) => onNavigate && onNavigate('task-detail', { taskId })}
             />
         ))}

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import Login from './components/Login.jsx';
 import Signup from './components/Signup.jsx';
 import MainList from './components/MainList.jsx';
+import MyTaskList from './components/MyTaskList.jsx';
 import AdminPanel from './components/admin/AdminPanel.jsx';
 import TaskPage from './components/task/TaskPage.jsx';
 import CalendarPage from './components/calendar/CalendarPage.jsx';
@@ -90,6 +91,10 @@ function App() {
 
   if (screen === 'create-task') {
     return <TaskPage user={user} onNavigate={handleNavigate} onLogout={handleLogout} />;
+  }
+
+  if (screen === 'my-tasks') {
+    return <MyTaskList user={user} onNavigate={handleNavigate} onLogout={handleLogout} />;
   }
 
   if (screen === 'calendar') {
